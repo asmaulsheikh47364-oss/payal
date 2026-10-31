@@ -337,7 +337,7 @@
   $("#out").addEventListener("click", function () { sb.auth.signOut().then(function () { location.reload(); }); });
   function start(session) {
     if (!session) { show("login"); return; }
-    $("#who").textContent = session.user.email || "";
+    var um = session.user.user_metadata || {}; $("#who").textContent = um.full_name || um.name || "Asmaul Sheikh";
     $("#out").hidden = false;
     sb.rpc("is_admin").then(function (r) { if (r.data === true) { show("app"); drawTabs(); draw(); } else show("denied"); });
   }

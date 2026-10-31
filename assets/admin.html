@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://hwfifqyssabwwdjlbqty.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Payal Admin</title>
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/admin.css">
+</head><body>
+<header><img class="av" src="assets/creator.jpg" alt=""><span id="who">Asmaul Sheikh</span><a href="account.html" class="swapb">&#128100; Customer view</a><button id="out" hidden>Logout</button></header>
+<main>
+<section id="login" hidden>
+  <p>Private page. Login with the owner Gmail.</p>
+  <button id="gbtn" class="pri">Login with Google</button>
+  <p id="err" class="bad"></p>
+</section>
+<section id="denied" hidden><p class="bad">Access denied.</p></section>
+<section id="app" hidden>
+  <nav id="tabs"></nav>
+  <div id="view"></div>
+</section>
+<div id="toast"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/admin.js"></script>
+</body></html>

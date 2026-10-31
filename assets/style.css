@@ -1,5 +1,5 @@
 :root{
-  --bg:#070a14;--bg2:#0b1022;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.10);
+  --bg:#080d22;--bg2:#0c1438;--card:rgba(255,255,255,.09);--line:rgba(130,150,255,.20);
   --text:#e9edf7;--muted:#9aa6c4;--cyan:#22d3ee;--violet:#8b5cf6;--pink:#f472b6;--gold:#fbbf24;--green:#34d399;
   --grad:linear-gradient(120deg,#22d3ee,#8b5cf6 55%,#f472b6);
   --r:22px;--max:1180px;
@@ -7,10 +7,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font-family:'Inter','Noto Sans Devanagari',system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
-body:before{content:"";position:fixed;inset:0;z-index:-2;background:
- radial-gradient(900px 520px at 85% -5%,rgba(139,92,246,.22),transparent 60%),
- radial-gradient(800px 500px at 0% 20%,rgba(34,211,238,.14),transparent 60%),
- radial-gradient(700px 500px at 60% 95%,rgba(244,114,182,.10),transparent 60%),var(--bg)}
+body:before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(circle 70vw at 92% 6%,rgba(139,92,246,.33),transparent),radial-gradient(circle 70vw at 4% 55%,rgba(34,211,238,.20),transparent),radial-gradient(circle 60vw at 88% 96%,rgba(244,114,182,.20),transparent),linear-gradient(180deg,#0c1438,#080d22 50%,#0a0a1c)}
 img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
 h1,h2,h3,h4{font-family:'Poppins','Noto Sans Devanagari',sans-serif;line-height:1.15;letter-spacing:-.01em}
@@ -21,7 +18,7 @@ html[lang=en] .hi{display:none!important}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 
 /* nav */
-.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(7,10,20,.72);border-bottom:1px solid var(--line)}
+.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(8,13,34,.74);border-bottom:1px solid var(--line)}
 .nav .wrap{display:flex;align-items:center;gap:18px;height:66px}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Poppins',sans-serif;font-weight:700;font-size:20px}
 .brand img{width:34px;height:34px;border-radius:50%;box-shadow:0 0 0 2px rgba(34,211,238,.5)}
