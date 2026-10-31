@@ -31,14 +31,14 @@
   }
   var PN = { free: "Free", plus: "Plus", pro: "Pro" };
   var tab = "home";
-  var TABS = [["home", "Home"], ["users", "Users"], ["gift", "🎁 Gift"], ["help", "Madad"], ["cust", "💰 Grahak"], ["pay", "Payments"], ["plans", "Daam"], ["log", "Log"]];
+  var TABS = [["home", "Home"], ["users", "Users"], ["gift", "🎁 Gift"], ["help", "Madad"], ["pay", "Payments"], ["plans", "Daam"], ["log", "Log"]];
   function drawTabs() {
     var n = $("#tabs"); n.textContent = "";
     TABS.forEach(function (t) { n.appendChild(el("button", { text: t[1], class: tab === t[0] ? "on" : "", onclick: function () { tab = t[0]; drawTabs(); draw(); } })); });
   }
   function draw() {
     var v = $("#view"); v.textContent = "";
-    ({ home: home, users: users, gift: gift, help: helpbox, cust: customers, pay: payments, plans: plans, log: audit })[tab](v);
+    ({ home: home, users: users, gift: gift, help: helpbox, pay: payments, plans: plans, log: audit })[tab](v);
   }
   function home(v) {
     call("admin_overview").then(function (d) {
@@ -204,73 +204,6 @@
     v.appendChild(seg); drawSeg();
     v.appendChild(list);
     load();
-  }
-  function customers(v) {
-    var PRICE = { plus: 49, pro: 99 };
-    var chosen = "plus";
-    var em = el("input", { type: "email", placeholder: "payer@gmail.com", autocapitalize: "none" });
-    var amt = el("input", { type: "number", value: "49", min: "1" });
-    var ref = el("input", { placeholder: "UTR ya pay_ ID (zaroori)", autocapitalize: "none" });
-    var note = el("input", { placeholder: "Note (zaroori nahi)" });
-    var seg = el("div", { class: "seg" });
-    function drawSeg() {
-      seg.textContent = "";
-      [["plus", "Plus"], ["pro", "Pro"]].forEach(function (p) {
-        seg.appendChild(el("button", { text: p[1] + " Rs " + PRICE[p[0]], class: (chosen === p[0] ? "on " : "") + (p[0] === "pro" ? "gold" : "pri"), onclick: function () { chosen = p[0]; amt.value = String(PRICE[chosen]); drawSeg(); } }));
-      });
-    }
-    drawSeg();
-    var form = el("div", { class: "card" }, [
-      el("h2", { text: "Hath se payment darj karo" }),
-      el("div", { class: "hint", text: "Pehle screenshot me dekho ki paisa tumhe mila hai. Phir yahan likho. Gmail hamesha ke liye list me rahega aur 30 din ka plan mil jayega. Wahi UTR dobara nahi chalega." }),
-      el("label", { text: "Payer ka Gmail" }), em, el("label", { text: "Plan" }), seg,
-      el("label", { text: "Rakam (Rs)" }), amt, el("label", { text: "UTR / Payment ID" }), ref, el("label", { text: "Note" }), note,
-      el("div", { class: "row grow", style: "margin-top:12px" }, [el("button", { text: "Darj karo aur plan do", class: "pri", onclick: function () {
-        var e = em.value.trim().toLowerCase();
-        if (!confirm(e + " ko " + PN[chosen] + " 30 din ke liye dein? Rs " + amt.value + " | " + ref.value.trim())) return;
-        call("admin_manual_payment", { p_email: e, p_plan: chosen, p_amount: parseInt(amt.value, 10) || 0, p_ref: ref.value.trim(), p_note: note.value.trim() }).then(function (r) {
-          if (!r) return;
-          toast(r.applied ? "Darj ho gaya, plan chalu" : "Darj ho gaya, login par plan milega");
-          em.value = ""; ref.value = ""; note.value = ""; load("");
-        });
-      } })])
-    ]);
-    v.appendChild(form);
-    var q = el("input", { placeholder: "Gmail dhundho", autocapitalize: "none" });
-    v.appendChild(el("div", { class: "row" }, [el("div", { style: "flex:1 1 200px" }, [q]), el("button", { text: "Search", class: "pri", onclick: function () { load(q.value.trim()); } })]));
-    var list = el("div");
-    v.appendChild(list);
-    function load(s) {
-      call("admin_customers", { p_q: s, p_limit: 100 }).then(function (rows) {
-        if (!rows) return;
-        list.textContent = "";
-        list.appendChild(el("p", { class: "mut", text: "Paisa dene wale: " + rows.length + " (ye list kabhi delete nahi hoti)" }));
-        rows.forEach(function (c) {
-          var now = c.tier && c.expires_at ? PN[c.tier] + " | " + d0(c.expires_at) + " tak" : "Abhi plan nahi";
-          list.appendChild(el("div", { class: "card" }, [
-            el("div", { class: "row" }, [el("span", { class: "em", text: c.email }), el("span", { class: "tag " + c.last_plan, text: PN[c.last_plan] || c.last_plan })]),
-            el("div", { text: "Kul Rs " + c.total + " | " + c.n + " baar" }),
-            el("div", { class: "mut", text: "Pehli: " + d0(c.first_at) + " | Aakhri: " + d0(c.last_at) }),
-            el("div", { class: "mut", text: now })
-          ]));
-        });
-        if (!s) ledger();
-      });
-    }
-    function ledger() {
-      call("admin_ledger", { p_limit: 30 }).then(function (rows) {
-        if (!rows) return;
-        list.appendChild(el("h2", { text: "Taza payments" }));
-        rows.forEach(function (x) {
-          list.appendChild(el("div", { class: "card" }, [
-            el("div", { class: "row" }, [el("span", { class: "em", text: x.email }), el("span", { class: "ok", text: "Rs " + x.amount })]),
-            el("div", { class: "mut", text: dt(x.at) + " | " + (PN[x.plan] || x.plan) + " | " + x.source }),
-            el("div", { class: "mut", text: "ID: " + (x.ref || "-") + (x.note ? " | " + x.note : "") })
-          ]));
-        });
-      });
-    }
-    load("");
   }
   function payments(v) {
     call("admin_payments", { p_limit: 100 }).then(function (rows) {
