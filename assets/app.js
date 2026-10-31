@@ -35,7 +35,8 @@
   $$("[data-year]").forEach(function (e) { e.textContent = new Date().getFullYear(); });
 
   /* plans: prices, discount and saving are computed from config */
-  (C.plans || []).forEach(function (p) {
+  function applyPlans(list) {
+  (list || []).forEach(function (p) {
     var el = $("#plan-" + p.id); if (!el) return;
     var now = $(".now", el), mrp = $(".mrp", el), save = $(".save", el), off = $(".offer", el);
     if (now) now.textContent = p.price === 0 ? "₹0" : "₹" + p.price;
@@ -46,6 +47,20 @@
       if (off) { off.querySelector(".hi").textContent = "🔥 " + p.offerHi; off.querySelector(".en").textContent = "🔥 " + p.offerEn; }
     } else { if (mrp) mrp.style.display = "none"; if (save) save.style.display = "none"; }
   });
+  }
+  applyPlans(C.plans);
+  /* prices and offers set in the admin panel replace the defaults */
+  try {
+    fetch(C.supabaseUrl + "/rest/v1/rpc/public_plans", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: "{}" })
+      .then(function (r) { return r.json(); })
+      .then(function (rows) {
+        if (!Array.isArray(rows) || !rows.length) return;
+        var list = [{ id: "free", price: 0, mrp: 0, offerHi: "", offerEn: "" }];
+        rows.forEach(function (x) { list.push({ id: x.id, price: x.price, mrp: x.mrp, offerHi: x.offerHi || "", offerEn: x.offerEn || "" }); });
+        $$(".mrp").forEach(function (e) { e.style.display = ""; });
+        applyPlans(list);
+      }).catch(function () {});
+  } catch (e) {}
 
   /* buy */
   var modal = $("#modal");

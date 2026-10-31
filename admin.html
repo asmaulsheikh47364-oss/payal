@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Payal Admin</title>
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/admin.css">
+</head><body>
+<header><b>Payal Admin</b><span id="who"></span><button id="out" hidden>Logout</button></header>
+<main>
+<section id="login" hidden>
+  <p>Only the owner can open this page.</p>
+  <button id="gbtn" class="pri">Login with Google</button>
+  <p id="err" class="bad"></p>
+</section>
+<section id="denied" hidden><p class="bad">This Gmail is not an admin.</p></section>
+<section id="app" hidden>
+  <nav id="tabs"></nav>
+  <div id="view"></div>
+</section>
+<div id="toast"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/admin.js"></script>
+</body></html>
