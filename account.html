@@ -23,6 +23,7 @@
 <body>
 <header class="nav"><div class="wrap">
 <a class="brand" href="index.html"><img src="assets/favicon.png" alt="Payal"><span>Payal</span></a>
+<a class="btn ghost sm" id="swap" href="admin.html" hidden>&#128736; Admin</a>
 <button class="burger" id="burger" aria-label="Menu">☰</button>
 <nav class="links" id="links">
 <a class="l" href="index.html#features"><span class="hi">फ़ीचर</span><span class="en">Features</span></a>
@@ -52,6 +53,10 @@
 <div class="card"><div class="role"><span class="hi">आज के बचे मिनट</span><span class="en">Minutes left today</span></div><h3 id="free" class="big"></h3><p style="margin:0"><span class="hi">सिर्फ़ Free प्लान में। रात 12 बजे नए मिलते हैं।</span><span class="en">Free plan only. Renews at midnight IST.</span></p></div>
 <div class="card"><div class="role"><span class="hi">आपका फ़ोन</span><span class="en">Your phone</span></div><h3 id="dev" class="big"></h3><p id="devnote" style="margin:0"></p></div>
 </div>
+<div class="card gift" id="gift" style="margin-top:18px">
+<div id="giftlock"><div class="role">&#128274; <span class="hi">आपका ऐप</span><span class="en">Your app</span></div><h3><span class="hi">Plus / Pro ऐप: अभी बंद</span><span class="en">Plus / Pro app: locked</span></h3><p><span class="hi">प्लान खरीदते ही यह खुल जाएगा और आपके प्लान का ऐप यहीं डाउनलोड के लिए मिलेगा।</span><span class="en">It unlocks the moment you buy a plan, and your plan's app is ready to download right here.</span></p><span class="btn ghost" style="opacity:.55;pointer-events:none">&#128274; <span class="hi">डाउनलोड (प्लान लेने पर खुलेगा)</span><span class="en">Download (opens after you buy)</span></span></div>
+<div id="giftopen" hidden><div class="role">&#127873; <span class="hi">ताला खुल गया!</span><span class="en">Unlocked!</span></div><h3 id="gifttitle"></h3><p><span class="hi">ऐप में इसी Gmail से login करते ही आपका प्लान अपने आप चालू हो जाएगा।</span><span class="en">Log in to the app with this same Gmail and your plan turns on by itself.</span></p><a class="btn primary" data-apk href="#">&#11015; <span class="hi">डाउनलोड करो</span><span class="en">Download</span></a>
+<ol class="fine" style="margin:14px 0 0 18px;padding:0;line-height:1.8"><li><span class="hi">APK डाउनलोड करो।</span><span class="en">Download the APK.</span></li><li><span class="hi">फ़ाइल खोलकर install करो (फ़ोन अनुमति माँगे तो दे दो)।</span><span class="en">Open the file and install it (allow it if the phone asks).</span></li><li><span class="hi">ऐप में इसी Gmail से login करो।</span><span class="en">Log in to the app with this same Gmail.</span></li></ol></div></div>
 <div class="card" style="margin-top:18px">
 <h3 style="margin-bottom:8px"><span class="hi">प्लान बढ़ाओ</span><span class="en">Upgrade your plan</span></h3><p style="margin-bottom:16px"><span class="hi">Plus और Pro 30 दिन के हैं, अपने आप नहीं कटते।</span><span class="en">Plus and Pro last 30 days and never renew automatically.</span></p>
 <div class="grid g2 acplans">

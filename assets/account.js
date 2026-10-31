@@ -42,6 +42,10 @@
       $("#dev").innerHTML = hl("अभी कोई नहीं", "None yet");
       $("#devnote").innerHTML = hl("ऐप में login करते ही पहला फ़ोन जुड़ेगा।", "The first phone links when you log in from the app.");
     }
+    var locked = tier === "free";
+    $("#giftlock").hidden = !locked;
+    $("#giftopen").hidden = locked;
+    if (!locked) { var tn = tier === "pro" ? "Pro" : "Plus"; $("#gifttitle").innerHTML = hl("आपका " + tn + " ऐप तैयार है", "Your " + tn + " app is ready"); }
     show("me");
   }
   function load(session) {
@@ -89,7 +93,7 @@
     });
   }
   function adminLink() {
-    sb.rpc("is_admin").then(function (r) { var l = $("#adminlink"); if (l && r.data === true) l.hidden = false; });
+    sb.rpc("is_admin").then(function (r) { var l = $("#adminlink"); var sw = $("#swap"); if (r.data === true) { if (l) l.hidden = false; if (sw) sw.hidden = false; } });
   }
 
   function fn(path, body) {
