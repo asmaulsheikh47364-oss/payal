@@ -48,3 +48,4 @@ header #who{color:var(--fg);font-size:17px;font-weight:700}
 header a.swapb{border:1px solid var(--line);background:rgba(255,255,255,.09);padding:8px 12px;border-radius:12px;font-weight:600;white-space:nowrap;font-size:14px;color:var(--fg)}
 header #out{min-height:34px;padding:6px 10px;font-size:13px}header{gap:8px}header #who{min-width:0}
 header #who{white-space:normal;line-height:1.15;overflow:visible}
+header a.bd{display:flex;align-items:center;gap:10px}header a.bd span{flex:0 0 auto;font-family:Poppins,system-ui,sans-serif;font-size:20px}
