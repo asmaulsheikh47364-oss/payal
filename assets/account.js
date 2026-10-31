@@ -17,10 +17,15 @@
       .then(function (r) { if (r.error) err(r.error.message); });
   });
   $("#outbtn").addEventListener("click", function () { sb.auth.signOut().then(function () { show("login"); }); });
+  function maskMail(e) {
+    var i = e.indexOf("@");
+    if (i < 3) return e;
+    return e.slice(0, 2) + "***" + e.slice(i - 2);
+  }
   function render(st, user) {
     var m = user.user_metadata || {};
     $("#uname").textContent = m.full_name || m.name || "";
-    $("#uemail").textContent = user.email || "";
+    $("#uemail").textContent = maskMail(user.email || "");
     var tier = st.tier || "free";
     $("#tier").textContent = tier === "pro" ? "Pro" : tier === "plus" ? "Plus" : "Free";
     $("#texp").innerHTML = tier === "free" ? hl("हमेशा मुफ़्त", "Free forever") : hl("चालू है: " + dt(st.expires_at) + " तक", "Active until " + dt(st.expires_at));
