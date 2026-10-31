@@ -46,6 +46,36 @@
       render(r.data || {}, session.user);
     });
   }
-  sb.auth.getSession().then(function (r) { load(r.data && r.data.session); });
-  sb.auth.onAuthStateChange(function (ev, session) { if (ev === "SIGNED_IN" || ev === "SIGNED_OUT") load(session); });
+  function setup() {
+    var kind = $("#hkind");
+    if (!kind) return;
+    function sync() { var p = kind.value === "payment"; $("#hplanw").style.display = p ? "" : "none"; $("#hrefw").style.display = p ? "" : "none"; }
+    kind.addEventListener("change", sync); sync();
+    $("#hsend").addEventListener("click", function () {
+      var st = $("#hstat"); st.textContent = "...";
+      sb.rpc("support_send", { p_kind: kind.value, p_plan: kind.value === "payment" ? $("#hplan").value : null, p_ref: $("#href").value, p_message: $("#hmsg").value }).then(function (r) {
+        if (r.error) { st.textContent = r.error.message; return; }
+        if (r.data && r.data.error) { st.textContent = r.data.error; return; }
+        st.textContent = document.documentElement.lang === "en" ? "Sent. We will check soon." : "भेज दिया। जल्द देखा जाएगा।";
+        $("#hmsg").value = ""; $("#href").value = ""; mine();
+      });
+    });
+  }
+  function mine() {
+    sb.rpc("support_mine").then(function (r) {
+      var box = $("#hmine"); if (!box || !r.data || !r.data.items) return;
+      box.textContent = "";
+      r.data.items.forEach(function (m) {
+        var p = document.createElement("p"); p.className = "fine";
+        p.textContent = dt(m.created_at) + " · " + (m.status === "done" ? "✔ " : "⏳ ") + (m.admin_note || (m.status === "done" ? "Done" : "Pending"));
+        box.appendChild(p);
+      });
+    });
+  }
+  function adminLink() {
+    sb.rpc("is_admin").then(function (r) { var l = $("#adminlink"); if (l && r.data === true) l.hidden = false; });
+  }
+  setup();
+  sb.auth.getSession().then(function (r) { load(r.data && r.data.session); if (r.data && r.data.session) { mine(); adminLink(); } });
+  sb.auth.onAuthStateChange(function (ev, session) { if (ev === "SIGNED_IN" || ev === "SIGNED_OUT") { load(session); if (session) { mine(); adminLink(); } } });
 })();

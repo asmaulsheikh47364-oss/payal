@@ -6,6 +6,8 @@
 <title>Account | Payal</title>
 <meta name="description" content="Your Payal account, plan and free minutes">
 <meta name="theme-color" content="#070a14">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://hwfifqyssabwwdjlbqty.supabase.co; base-uri 'none'; object-src 'none'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="icon" href="assets/favicon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Account | Payal">
@@ -56,7 +58,9 @@
 <button class="btn primary" type="button" data-buy="plus">Plus</button>
 <button class="btn primary" type="button" data-buy="pro">Pro</button>
 <a class="btn green" data-wa="Namaste, mujhe Payal ke account mein madad chahiye." href="#">&#128172; WhatsApp</a>
+<a class="btn ghost" id="adminlink" href="admin.html" hidden>Admin</a>
 </div></div>
+<div class="card" style="margin-top:18px" id="helpcard"><h3 style="margin-bottom:8px"><span class="hi">मदद चाहिए? या पैसा कटा पर प्लान नहीं मिला?</span><span class="en">Need help? Money paid but no plan?</span></h3><p style="margin-bottom:12px"><span class="hi">यहाँ बताओ। मैं देखकर प्लान चालू कर दूँगा। तुरंत चाहिए तो WhatsApp भी कर सकते हो।</span><span class="en">Tell us here. We will check and switch your plan on. For urgent help you can also use WhatsApp.</span></p><div class="frm"><label><span class="hi">क्या हुआ?</span><span class="en">What happened?</span></label><select id="hkind"><option value="payment">पैसा कटा, प्लान नहीं मिला / Paid, plan not active</option><option value="help">कोई और मदद / Other help</option></select><div id="hplanw"><label><span class="hi">कौन सा प्लान लिया था?</span><span class="en">Which plan did you buy?</span></label><select id="hplan"><option value="plus">Plus</option><option value="pro">Pro</option></select></div><div id="hrefw"><label><span class="hi">Payment ID या UTR (रसीद पर लिखा)</span><span class="en">Payment ID or UTR (written on your receipt)</span></label><input id="href" maxlength="100" autocomplete="off" placeholder="pay_XXXXXXXX / UTR"></div><label><span class="hi">आपका संदेश</span><span class="en">Your message</span></label><textarea id="hmsg" maxlength="1000" rows="3"></textarea><button class="btn primary" id="hsend" type="button" style="margin-top:12px"><span class="hi">भेजो</span><span class="en">Send</span></button> <span id="hstat" class="fine"></span><div id="hmine"></div></div></div>
 </div>
 <p id="err" class="fine" style="color:#fca5a5"></p>
 </main>

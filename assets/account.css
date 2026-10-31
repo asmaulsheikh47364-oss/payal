@@ -3,3 +3,7 @@
 .acc .big{font-size:28px;margin:4px 0 8px}
 .acc .card p{color:#c3cbe3}
 [hidden]{display:none!important}
+
+.frm label{display:block;margin:12px 0 4px;font-size:14px;opacity:.8}
+.frm select,.frm input,.frm textarea{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:inherit;font:inherit}
+#hmine{margin-top:12px}
