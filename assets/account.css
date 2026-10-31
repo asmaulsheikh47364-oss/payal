@@ -1,0 +1,5 @@
+.acc-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.acc .role{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);font-weight:700;margin-bottom:6px}
+.acc .big{font-size:28px;margin:4px 0 8px}
+.acc .card p{color:#c3cbe3}
+[hidden]{display:none!important}

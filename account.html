@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Account | Payal</title>
+<meta name="description" content="Your Payal account, plan and free minutes">
+<meta name="theme-color" content="#070a14">
+<link rel="icon" href="assets/favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Account | Payal">
+<meta property="og:description" content="Your Payal account, plan and free minutes">
+<meta property="og:image" content="https://asmaulsheikh47364-oss.github.io/payal/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/account.css">
+</head>
+<body>
+<header class="nav"><div class="wrap">
+<a class="brand" href="index.html"><img src="assets/favicon.png" alt="Payal"><span>Payal</span></a>
+<button class="burger" id="burger" aria-label="Menu">☰</button>
+<nav class="links" id="links">
+<a class="l" href="index.html#features"><span class="hi">फ़ीचर</span><span class="en">Features</span></a>
+<a class="l" href="index.html#plans"><span class="hi">प्लान</span><span class="en">Plans</span></a>
+<a class="l" href="index.html#how"><span class="hi">कैसे चलता है</span><span class="en">How it works</span></a>
+<a class="l" href="index.html#faq"><span class="hi">सवाल-जवाब</span><span class="en">FAQ</span></a>
+<a class="l" href="index.html#creator"><span class="hi">बनाने वाले</span><span class="en">Creator</span></a>
+<a class="l" href="account.html"><span class="hi">👤 अकाउंट</span><span class="en">👤 Account</span></a>
+<button class="lang" id="langBtn" type="button">English</button>
+<a class="btn primary sm" data-apk href="#"><span class="hi">⬇ डाउनलोड</span><span class="en">⬇ Download</span></a>
+</nav></div></header>
+<main class="doc acc">
+<h1><span class="hi">आपका अकाउंट</span><span class="en">Your account</span></h1>
+<div class="upd"><span class="hi">Google से login करो और अपना प्लान देखो</span><span class="en">Log in with Google and see your plan</span></div>
+<div id="loading" class="fine"><span class="hi">लोड हो रहा है...</span><span class="en">Loading...</span></div>
+<div id="login" hidden>
+<div class="card" style="max-width:520px">
+<h3 style="margin-bottom:8px"><span class="hi">Google से login</span><span class="en">Log in with Google</span></h3>
+<p style="margin-bottom:16px"><span class="hi">वही Gmail जो ऐप में इस्तेमाल करोगे। प्लान इसी Gmail से जुड़ता है।</span><span class="en">Use the same Gmail you will use in the app. Your plan is tied to it.</span></p>
+<button class="btn primary" id="gbtn" type="button">G &nbsp;<span class="hi">Google से login करो</span><span class="en">Continue with Google</span></button>
+</div></div>
+<div id="me" hidden>
+<div class="card acc-top"><div><div class="role"><span class="hi">आप</span><span class="en">You</span></div><h3 id="uname"></h3><p id="uemail" style="margin:0"></p></div>
+<button class="btn ghost sm" id="outbtn" type="button"><span class="hi">Logout</span><span class="en">Log out</span></button></div>
+<div class="grid g3" style="margin-top:18px">
+<div class="card"><div class="role"><span class="hi">आपका प्लान</span><span class="en">Your plan</span></div><h3 id="tier" class="big"></h3><p id="texp" style="margin:0"></p></div>
+<div class="card"><div class="role"><span class="hi">आज के बचे मिनट</span><span class="en">Minutes left today</span></div><h3 id="free" class="big"></h3><p style="margin:0"><span class="hi">सिर्फ़ Free प्लान में। रात 12 बजे नए मिलते हैं।</span><span class="en">Free plan only. Renews at midnight IST.</span></p></div>
+<div class="card"><div class="role"><span class="hi">आपका फ़ोन</span><span class="en">Your phone</span></div><h3 id="dev" class="big"></h3><p id="devnote" style="margin:0"></p></div>
+</div>
+<div class="card" style="margin-top:18px">
+<h3 style="margin-bottom:8px"><span class="hi">प्लान बढ़ाओ</span><span class="en">Upgrade your plan</span></h3><p style="margin-bottom:16px"><span class="hi">Plus और Pro 30 दिन के हैं, अपने आप नहीं कटते।</span><span class="en">Plus and Pro last 30 days and never renew automatically.</span></p>
+<div class="row" style="display:flex;gap:12px;flex-wrap:wrap">
+<button class="btn primary" type="button" data-buy="plus">Plus</button>
+<button class="btn primary" type="button" data-buy="pro">Pro</button>
+<a class="btn green" data-wa="Namaste, mujhe Payal ke account mein madad chahiye." href="#">&#128172; WhatsApp</a>
+</div></div>
+</div>
+<p id="err" class="fine" style="color:#fca5a5"></p>
+</main>
+<div class="modal" id="modal"><div class="mbox"><h3><span class="hi">भुगतान जल्द शुरू हो रहा है</span><span class="en">Payments are starting soon</span></h3><p><span class="hi">ऑनलाइन भुगतान अगले अपडेट में चालू होगा। तब तक WhatsApp पर हमसे बात कर सकते हो।</span><span class="en">Online payment arrives in the next update. Until then you can message us on WhatsApp.</span></p>
+<div class="row"><a class="btn green" data-wa="Namaste, mujhe Payal ka paid plan lena hai." href="#">&#128172; <span class="hi">WhatsApp पर पूछो</span><span class="en">Ask on WhatsApp</span></a><button class="btn ghost" data-close type="button"><span class="hi">बंद करो</span><span class="en">Close</span></button></div></div></div>
+<footer><div class="wrap">
+<div class="fgrid">
+<div><a class="brand" href="index.html"><img src="assets/favicon.png" alt="Payal"><span>Payal</span></a>
+<p style="color:var(--muted);margin-top:12px;max-width:340px;font-size:14.5px"><span class="hi">आपकी अपनी AI साथी: बोलकर और लिखकर बात, फ़ोटो, कैमरा और फ़ोन का काम।</span><span class="en">Your own AI companion: talk and chat, photos, camera and phone control.</span></p></div>
+<div><h4><span class="hi">उत्पाद</span><span class="en">Product</span></h4><a href="index.html#plans"><span class="hi">प्लान</span><span class="en">Plans</span></a><a href="index.html#download"><span class="hi">डाउनलोड</span><span class="en">Download</span></a><a href="index.html#faq"><span class="hi">सवाल-जवाब</span><span class="en">FAQ</span></a><a href="contact.html"><span class="hi">संपर्क</span><span class="en">Contact</span></a></div>
+<div><h4><span class="hi">नियम</span><span class="en">Legal</span></h4><a href="privacy.html"><span class="hi">प्राइवेसी पॉलिसी</span><span class="en">Privacy Policy</span></a><a href="terms.html"><span class="hi">उपयोग की शर्तें</span><span class="en">Terms of Use</span></a><a href="refund.html"><span class="hi">रिफ़ंड नीति</span><span class="en">Refund Policy</span></a></div>
+</div>
+<div class="copy"><span>© <span data-year></span> Payal. <span class="hi">सर्वाधिकार सुरक्षित।</span><span class="en">All rights reserved.</span></span><span><span class="hi">भवानीपुर, पाकुड़, झारखंड में बना ❤</span><span class="en">Made with ❤ in Pakur, Jharkhand</span></span></div>
+</div></footer>
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script><script src="assets/account.js"></script>
+</body></html>
