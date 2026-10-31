@@ -63,6 +63,11 @@
   } catch (e) {}
 
   /* buy */
+  try {
+    fetch(C.supabaseUrl + "/rest/v1/rpc/public_settings", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: "{}" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d && d.payments_live === true) C.paymentsLive = true; }).catch(function () {});
+  } catch (e) {}
   var modal = $("#modal");
   function openModal(plan) {
     if (!modal) return;
@@ -72,7 +77,7 @@
   $$("[data-buy]").forEach(function (b) {
     b.addEventListener("click", function (e) {
       e.preventDefault();
-      if (C.paymentsLive) { location.href = "account.html?plan=" + b.getAttribute("data-buy"); return; }
+      if (C.paymentsLive) { if (window.payalBuy) { window.payalBuy(b.getAttribute("data-buy")); return; } location.href = "account.html?plan=" + b.getAttribute("data-buy"); return; }
       openModal(b.getAttribute("data-buy").toUpperCase());
     });
   });

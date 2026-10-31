@@ -53,13 +53,24 @@
     kind.addEventListener("change", sync); sync();
     $("#hsend").addEventListener("click", function () {
       var st = $("#hstat"); st.textContent = "...";
+      var rid = $("#href").value.trim();
+      if (kind.value === "payment" && /^pay_[A-Za-z0-9]+$/.test(rid) && window.payalClaim) {
+        window.payalClaim(rid).then(function (v) {
+          if (v && v.ok) { st.textContent = document.documentElement.lang === "en" ? "Verified! Your plan is active." : "पक्का हो गया! आपका प्लान चालू है।"; $("#href").value = ""; reload(); }
+          else { st.textContent = (v && v.error) || "..."; sendMsg(st); }
+        });
+        return;
+      }
+      sendMsg(st);
+    });
+    function sendMsg(st) {
       sb.rpc("support_send", { p_kind: kind.value, p_plan: kind.value === "payment" ? $("#hplan").value : null, p_ref: $("#href").value, p_message: $("#hmsg").value }).then(function (r) {
         if (r.error) { st.textContent = r.error.message; return; }
         if (r.data && r.data.error) { st.textContent = r.data.error; return; }
         st.textContent = document.documentElement.lang === "en" ? "Sent. We will check soon." : "भेज दिया। जल्द देखा जाएगा।";
         $("#hmsg").value = ""; $("#href").value = ""; mine();
       });
-    });
+    }
   }
   function mine() {
     sb.rpc("support_mine").then(function (r) {
@@ -75,6 +86,57 @@
   function adminLink() {
     sb.rpc("is_admin").then(function (r) { var l = $("#adminlink"); if (l && r.data === true) l.hidden = false; });
   }
+
+  function fn(path, body) {
+    return sb.auth.getSession().then(function (r) {
+      var s = r.data && r.data.session;
+      if (!s) { err(document.documentElement.lang === "en" ? "Please log in first." : "पहले login करो।"); return null; }
+      return fetch(C.supabaseUrl + "/functions/v1/pay/" + path, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.access_token, "apikey": C.supabaseAnonKey }, body: JSON.stringify(body) })
+        .then(function (x) { return x.json(); });
+    });
+  }
+  function loadRzp() {
+    return new Promise(function (ok, bad) {
+      if (window.Razorpay) { ok(); return; }
+      var t = document.createElement("script"); t.src = "https://checkout.razorpay.com/v1/checkout.js";
+      t.onload = ok; t.onerror = bad; document.head.appendChild(t);
+    });
+  }
+  function reload() { sb.auth.getSession().then(function (r) { load(r.data && r.data.session); }); }
+  window.payalBuy = function (plan) {
+    err("");
+    fn("order", { plan: plan }).then(function (o) {
+      if (!o) return;
+      if (o.error) { err(o.error); return; }
+      loadRzp().then(function () {
+        var rz = new window.Razorpay({
+          key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: (plan === "pro" ? "Pro" : "Plus") + " - 30 days",
+          order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#22d3ee" },
+          handler: function (resp) {
+            err(document.documentElement.lang === "en" ? "Checking your payment..." : "भुगतान जाँच रहे हैं...");
+            fn("verify", resp).then(function (v) {
+              if (v && v.ok) { err(document.documentElement.lang === "en" ? "Done! Your plan is active. Open the app." : "हो गया! आपका प्लान चालू है। ऐप खोलो।"); reload(); }
+              else err((v && v.error) || (document.documentElement.lang === "en" ? "Payment received but not confirmed yet. It will switch on by itself, or send us the Payment ID below." : "भुगतान मिला पर पक्का नहीं हुआ। अपने आप चालू हो जाएगा, या नीचे Payment ID भेजो।"));
+            });
+          }
+        });
+        rz.open();
+      }).catch(function () { err("Payment window could not open."); });
+    });
+  };
+  window.payalClaim = function (id) {
+    return fn("claim", { payment_id: id });
+  };
+  (function () {
+    var m = /[?&]plan=(plus|pro)/.exec(location.search);
+    if (!m) return;
+    fetch(C.supabaseUrl + "/rest/v1/rpc/public_settings", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: "{}" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || d.payments_live !== true) return;
+        sb.auth.getSession().then(function (r) { if (r.data && r.data.session) window.payalBuy(m[1]); });
+      }).catch(function () {});
+  })();
   setup();
   sb.auth.getSession().then(function (r) { load(r.data && r.data.session); if (r.data && r.data.session) { mine(); adminLink(); } });
   sb.auth.onAuthStateChange(function (ev, session) { if (ev === "SIGNED_IN" || ev === "SIGNED_OUT") { load(session); if (session) { mine(); adminLink(); } } });
