@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /payal/admin.html
-Sitemap: https://asmaulsheikh47364-oss.github.io/payal/sitemap.xml
+Sitemap: https://payalapp.in/sitemap.xml

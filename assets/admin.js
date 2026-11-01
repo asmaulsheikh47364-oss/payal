@@ -2,7 +2,7 @@
   var C = window.PAYAL || {};
   var $ = function (s) { return document.querySelector(s); };
   var sb = window.supabase.createClient(C.supabaseUrl, C.supabaseAnonKey, { auth: { persistSession: true, detectSessionInUrl: true } });
-  var SITE = "https://asmaulsheikh47364-oss.github.io/payal/";
+  var SITE = "https://payalapp.in/";
   function el(tag, attrs, kids) {
     var e = document.createElement(tag);
     Object.keys(attrs || {}).forEach(function (k) {
