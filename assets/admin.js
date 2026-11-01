@@ -332,10 +332,14 @@
     });
   }
   $("#gbtn").addEventListener("click", function () {
-    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } }).then(function (r) { if (r.error) $("#err").textContent = r.error.message; });
+    try { sessionStorage.setItem("payalAdminGo", "1"); } catch (e) {}
+    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: "select_account" } } }).then(function (r) { if (r.error) $("#err").textContent = r.error.message; });
   });
-  $("#out").addEventListener("click", function () { sb.auth.signOut().then(function () { location.reload(); }); });
+  $("#out").addEventListener("click", function () { sb.auth.signOut({ scope: "local" }).then(function () { location.reload(); }); });
   function start(session) {
+    var go = false;
+    try { go = sessionStorage.getItem("payalAdminGo") === "1"; sessionStorage.removeItem("payalAdminGo"); } catch (e) {}
+    if (session && !go) { sb.auth.signOut({ scope: "local" }).then(function () { show("login"); }); return; }
     if (!session) { show("login"); return; }
     
     $("#out").hidden = false;
