@@ -276,6 +276,12 @@
     call("admin_payments", { p_limit: 100 }).then(function (rows) {
       if (!rows) return;
       if (!rows.length) v.appendChild(el("p", { class: "mut", text: "Abhi koi payment nahi aaya." }));
+      var nPaid = rows.filter(function (p) { return p.status === "paid"; }).length;
+      var sumPaid = rows.filter(function (p) { return p.status === "paid"; }).reduce(function (t, p) { return t + (Number(p.amount) || 0); }, 0);
+      if (rows.length) v.appendChild(el("div", { class: "card" }, [
+        el("div", { class: "row" }, [el("span", { class: "em", text: "Order bane: " + rows.length }), el("span", { class: "ok", text: "Paise mile: " + nPaid }), el("span", { class: "mut", text: "Adhure: " + (rows.length - nPaid) })]),
+        el("div", { class: "mut", text: "Mili rakam: Rs " + sumPaid + " (pichhle " + rows.length + " orders mein se)" })
+      ]));
       rows.forEach(function (p) {
         v.appendChild(el("div", { class: "card" }, [
           el("div", { class: "row" }, [el("span", { class: "em", text: p.email || "-" }), el("span", { class: "tag " + p.plan, text: PN[p.plan] || p.plan }), el("span", { class: p.status === "paid" ? "ok" : "mut", text: p.status + " | Rs " + p.amount })]),
