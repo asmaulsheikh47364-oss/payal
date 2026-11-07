@@ -3,23 +3,11 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
-  /* language */
-  function setLang(l) {
-    document.documentElement.lang = l;
-    try { localStorage.setItem("payal_lang", l); } catch (e) {}
-    var b = $("#langBtn"); if (b) b.textContent = l === "hi" ? "English" : "हिन्दी";
-  }
-  var saved = "hi";
-  try { saved = localStorage.getItem("payal_lang") || "hi"; } catch (e) {}
-  setLang(saved);
-  var lb = $("#langBtn");
-  if (lb) lb.addEventListener("click", function () { setLang(document.documentElement.lang === "hi" ? "en" : "hi"); });
-
   /* mobile menu */
   var bg = $("#burger"), lk = $("#links");
   if (bg && lk) {
-    bg.addEventListener("click", function () { lk.classList.toggle("open"); });
-    $$("#links a").forEach(function (a) { a.addEventListener("click", function () { lk.classList.remove("open"); }); });
+    bg.addEventListener("click", function () { var o = lk.classList.toggle("open"); bg.classList.toggle("open", o); bg.setAttribute("aria-expanded", o ? "true" : "false"); });
+    $$("#links a").forEach(function (a) { a.addEventListener("click", function () { lk.classList.remove("open"); bg.classList.remove("open"); }); });
   }
 
   /* links from config */
@@ -29,26 +17,43 @@
     a.href = "https://wa.me/" + (C.whatsapp || "") + "?text=" + encodeURIComponent(msg);
     a.target = "_blank"; a.rel = "noopener";
   });
+  $$("[data-mail]").forEach(function (e) { if (C.email) e.href = "mailto:" + C.email; });
   $$("[data-v]").forEach(function (e) { e.textContent = C.apkVersion || ""; });
   $$("[data-size]").forEach(function (e) { e.textContent = C.apkSize || ""; });
   var sh = $("#sha"); if (sh && C.apkSha256 && C.apkSha256.indexOf("__") < 0) sh.textContent = "SHA-256: " + C.apkSha256;
   $$("[data-year]").forEach(function (e) { e.textContent = new Date().getFullYear(); });
 
   /* plans: prices, discount and saving are computed from config */
+  function nextDay() {
+    var t = C.offerEnds ? Date.parse(C.offerEnds) : NaN;
+    if (isNaN(t)) return "";
+    var loc = (window.PAYAL_LANG === "hi" ? "hi-IN" : window.PAYAL_LANG === "bn" ? "bn-IN" : "en-IN") + "-u-nu-latn";
+    return new Date(t + 1000).toLocaleDateString(loc, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
+  }
+  var lastPlans = null;
   function applyPlans(list) {
-  (list || []).forEach(function (p) {
-    var el = $("#plan-" + p.id); if (!el) return;
-    var now = $(".now", el), mrp = $(".mrp", el), save = $(".save", el), off = $(".offer", el);
-    if (now) now.textContent = p.price === 0 ? "₹0" : "₹" + p.price;
-    if (p.mrp > p.price && p.price > 0) {
-      var pct = Math.round((1 - p.price / p.mrp) * 100);
-      if (mrp) mrp.textContent = "₹" + p.mrp;
-      if (save) { save.style.display = "inline-block"; save.querySelector(".hi").textContent = pct + "% की बचत · ₹" + (p.mrp - p.price) + " कम"; save.querySelector(".en").textContent = "Save " + pct + "% · ₹" + (p.mrp - p.price) + " off"; }
-      if (off) { off.querySelector(".hi").textContent = "🔥 " + p.offerHi; off.querySelector(".en").textContent = "🔥 " + p.offerEn; }
-    } else { if (mrp) mrp.style.display = "none"; if (save) save.style.display = "none"; }
-  });
+    lastPlans = list;
+    var nd = nextDay();
+    (list || []).forEach(function (p) {
+      var rupee = "\u20b9" + p.price;
+      $$('[data-p="' + p.id + '"]').forEach(function (e) { e.textContent = rupee; });
+      var after = p.mrp > p.price && p.price > 0 ? PT("After Diwali") + " \u20b9" + p.mrp + (nd ? " \u00b7 " + PT("from {d}").replace("{d}", nd) : "") : "";
+      $$('[data-after="' + p.id + '"]').forEach(function (e) { e.textContent = after; e.style.display = after ? "" : "none"; });
+      var el = $("#plan-" + p.id); if (!el) return;
+      var now = $(".now", el), mrp = $(".mrp", el), save = $(".save", el), off = $(".offer", el);
+      if (now) now.textContent = p.price === 0 ? "\u20b90" : rupee;
+      if (mrp) mrp.style.display = "none";
+      if (after) {
+        if (save) { save.style.display = "inline-block"; save.textContent = after; }
+        if (off && !off.classList.contains("static")) { off.textContent = PT(C.offerName || "Shubh Deepawali"); off.style.display = ""; }
+      } else {
+        if (save) save.style.display = "none";
+        if (off && !off.classList.contains("static")) { off.textContent = ""; off.style.display = "none"; }
+      }
+    });
   }
   applyPlans(C.plans);
+  document.addEventListener("payal:lang", function () { applyPlans(lastPlans || C.plans); });
   /* prices and offers set in the admin panel replace the defaults */
   try {
     fetch(C.supabaseUrl + "/rest/v1/rpc/public_plans", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: "{}" })
@@ -57,7 +62,6 @@
         if (!Array.isArray(rows) || !rows.length) return;
         var list = [{ id: "free", price: 0, mrp: 0, offerHi: "", offerEn: "" }];
         rows.forEach(function (x) { list.push({ id: x.id, price: x.price, mrp: x.mrp, offerHi: x.offerHi || "", offerEn: x.offerEn || "" }); });
-        $$(".mrp").forEach(function (e) { e.style.display = ""; });
         applyPlans(list);
       }).catch(function () {});
   } catch (e) {}
@@ -93,4 +97,24 @@
     }, { threshold: 0.12 });
     rv.forEach(function (e) { io.observe(e); });
   } else { rv.forEach(function (e) { e.classList.add("in"); }); }
+})();
+
+/* Language chooser in the mobile menu (English, Hindi, Bangla). Choice is only remembered for now. */
+(function(){
+  try{
+    var nav=document.getElementById('links'); if(!nav||document.getElementById('langbox'))return;
+    var langs=[['en','English'],['hi','हिन्दी'],['bn','বাংলা']], cur=window.PAYAL_LANG||'en';
+    var box=document.createElement('div'); box.id='langbox'; box.className='langbox';
+    var btn=document.createElement('button'); btn.type='button'; btn.className='l langbtn'; btn.setAttribute('aria-expanded','false');
+    function label(){var n=langs.filter(function(x){return x[0]===cur})[0];return 'Language<span class="lcur">'+(n?n[1]:'English')+'</span>'}
+    btn.innerHTML=label();
+    var list=document.createElement('div'); list.className='langlist'; list.hidden=true;
+    langs.forEach(function(x){var b=document.createElement('button');b.type='button';b.textContent=x[1];b.dataset.l=x[0];if(x[0]===cur)b.className='on';
+      b.onclick=function(){cur=x[0];if(window.PAYAL_SETLANG)window.PAYAL_SETLANG(cur);
+        [].forEach.call(list.children,function(c){c.className=c.dataset.l===cur?'on':''});btn.innerHTML=label();list.hidden=true;btn.setAttribute('aria-expanded','false')};
+      list.appendChild(b)});
+    btn.onclick=function(){list.hidden=!list.hidden;btn.setAttribute('aria-expanded',String(!list.hidden))};
+    box.appendChild(btn);box.appendChild(list);
+    var out=document.getElementById('m-out'); out?nav.insertBefore(box,out):nav.appendChild(box);
+  }catch(e){}
 })();

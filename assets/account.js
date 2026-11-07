@@ -8,8 +8,10 @@
     var d = new Date(s);
     return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
   }
-  function hl(hi, en) { return '<span class="hi">' + hi + '</span><span class="en">' + en + '</span>'; }
-  if (!window.supabase || !C.supabaseUrl) { show("login"); err("Server not connected"); return; }
+  /* text in the chosen language: pick(en, hi, bn) */
+  function hl(en, hi, bn) { return L(en, hi, bn); }
+  function dtl(s) { var l = window.PAYAL_LANG === "hi" ? "hi-IN" : window.PAYAL_LANG === "bn" ? "bn-IN" : "en-IN"; return new Date(s).toLocaleDateString(l + "-u-nu-latn", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }); }
+  if (!window.supabase || !C.supabaseUrl) { show("login"); err(hl("Server not connected", "सर्वर से जुड़ नहीं सका", "সার্ভারের সঙ্গে সংযোগ হয়নি")); return; }
   var sb = window.supabase.createClient(C.supabaseUrl, C.supabaseAnonKey, { auth: { persistSession: true, detectSessionInUrl: true } });
   $("#gbtn").addEventListener("click", function () {
     err("");
@@ -22,30 +24,33 @@
     if (i < 3) return e;
     return e.slice(0, 2) + "***" + e.slice(i - 2);
   }
+  var lastR = null;
+  document.addEventListener("payal:lang", function () { if (lastR) render(lastR[0], lastR[1]); });
   function render(st, user) {
+    lastR = [st, user];
     var m = user.user_metadata || {};
     $("#uname").textContent = m.full_name || m.name || "";
     $("#uemail").textContent = maskMail(user.email || "");
     var tier = st.tier || "free";
     $("#tier").textContent = tier === "pro" ? "Pro" : tier === "plus" ? "Plus" : "Free";
-    $("#texp").innerHTML = tier === "free" ? hl("हमेशा मुफ़्त", "Free forever") : hl("चालू है: " + dt(st.expires_at) + " तक", "Active until " + dt(st.expires_at));
+    $("#texp").textContent = tier === "free" ? hl("Free forever", "हमेशा मुफ़्त", "সবসময় বিনামূল্যে") : hl("Active until " + dtl(st.expires_at), "चालू है: " + dtl(st.expires_at) + " तक", "চালু আছে: " + dtl(st.expires_at) + " পর্যন্ত");
     if (tier === "free") {
       var s = st.free_seconds_left || 0;
       $("#free").textContent = Math.floor(s / 60) + ":" + two(s % 60);
     } else {
-      $("#free").innerHTML = hl("कोई सीमा नहीं", "No app limit");
+      $("#free").textContent = hl("No app limit", "कोई सीमा नहीं", "কোনো সীমা নেই");
     }
     if (st.device_bound) {
-      $("#dev").innerHTML = hl("जुड़ा है", "Linked");
-      $("#devnote").innerHTML = st.pending_unlock_at ? hl("नया फ़ोन " + dt(st.pending_unlock_at) + " को चालू होगा।", "A new phone activates on " + dt(st.pending_unlock_at) + ".") : hl("एक Gmail, एक फ़ोन।", "One Gmail, one phone.");
+      $("#dev").textContent = hl("Linked", "जुड़ा है", "যুক্ত আছে");
+      $("#devnote").textContent = st.pending_unlock_at ? hl("A new phone activates on " + dtl(st.pending_unlock_at) + ".", "नया फ़ोन " + dtl(st.pending_unlock_at) + " को चालू होगा।", "নতুন ফোন " + dtl(st.pending_unlock_at) + "-এ চালু হবে।") : hl("One Gmail, one phone.", "एक Gmail, एक फ़ोन।", "একটি Gmail, একটি ফোন।");
     } else {
-      $("#dev").innerHTML = hl("अभी कोई नहीं", "None yet");
-      $("#devnote").innerHTML = hl("ऐप में login करते ही पहला फ़ोन जुड़ेगा।", "The first phone links when you log in from the app.");
+      $("#dev").textContent = hl("None yet", "अभी कोई नहीं", "এখনও কোনোটি নেই");
+      $("#devnote").textContent = hl("The first phone links when you log in from the app.", "ऐप में लॉग इन करते ही पहला फ़ोन जुड़ेगा।", "অ্যাপে লগ ইন করলেই প্রথম ফোন যুক্ত হবে।");
     }
     var locked = tier === "free";
     $("#giftlock").hidden = !locked;
     $("#giftopen").hidden = locked;
-    if (!locked) { var tn = tier === "pro" ? "Pro" : "Plus"; $("#gifttitle").innerHTML = hl("आपका " + tn + " ऐप तैयार है", "Your " + tn + " app is ready"); }
+    if (!locked) { var tn = tier === "pro" ? "Pro" : "Plus"; $("#gifttitle").textContent = hl("Your " + tn + " app is ready", "आपका " + tn + " ऐप तैयार है", "আপনার " + tn + " অ্যাপ তৈরি"); }
     show("me");
   }
   function load(session) {
@@ -65,7 +70,7 @@
       var rid = $("#href").value.trim();
       if (kind.value === "payment" && /^pay_[A-Za-z0-9]+$/.test(rid) && window.payalClaim) {
         window.payalClaim(rid).then(function (v) {
-          if (v && v.ok) { st.textContent = document.documentElement.lang === "en" ? "Verified! Your plan is active." : "पक्का हो गया! आपका प्लान चालू है।"; $("#href").value = ""; reload(); }
+          if (v && v.ok) { st.textContent = hl("Verified! Your plan is active.", "पक्का हो गया! आपका प्लान चालू है।", "যাচাই হয়েছে! আপনার প্ল্যান চালু।"); $("#href").value = ""; reload(); }
           else { st.textContent = (v && v.error) || "..."; sendMsg(st); }
         });
         return;
@@ -76,7 +81,7 @@
       sb.rpc("support_send", { p_kind: kind.value, p_plan: kind.value === "payment" ? $("#hplan").value : null, p_ref: $("#href").value, p_message: $("#hmsg").value }).then(function (r) {
         if (r.error) { st.textContent = r.error.message; return; }
         if (r.data && r.data.error) { st.textContent = r.data.error; return; }
-        st.textContent = document.documentElement.lang === "en" ? "Sent. We will check soon." : "भेज दिया। जल्द देखा जाएगा।";
+        st.textContent = hl("Sent. We will check soon.", "भेज दिया। जल्द देखा जाएगा।", "পাঠানো হয়েছে। শীঘ্রই দেখা হবে।");
         $("#hmsg").value = ""; $("#href").value = ""; mine();
       });
     }
@@ -87,7 +92,7 @@
       box.textContent = "";
       r.data.items.forEach(function (m) {
         var p = document.createElement("p"); p.className = "fine";
-        p.textContent = dt(m.created_at) + " · " + (m.status === "done" ? "✔ " : "⏳ ") + (m.admin_note || (m.status === "done" ? "Done" : "Pending"));
+        p.textContent = dtl(m.created_at) + " · " + (m.status === "done" ? "✔ " : "⏳ ") + (m.admin_note || (m.status === "done" ? hl("Done", "हो गया", "হয়েছে") : hl("Pending", "बाकी है", "বাকি আছে")));
         box.appendChild(p);
       });
     });
@@ -99,7 +104,7 @@
   function fn(path, body) {
     return sb.auth.getSession().then(function (r) {
       var s = r.data && r.data.session;
-      if (!s) { err(document.documentElement.lang === "en" ? "Please log in first." : "पहले login करो।"); return null; }
+      if (!s) { err(hl("Please log in first.", "पहले लॉग इन कीजिए।", "আগে লগ ইন করুন।")); return null; }
       return fetch(C.supabaseUrl + "/functions/v1/pay/" + path, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.access_token, "apikey": C.supabaseAnonKey }, body: JSON.stringify(body) })
         .then(function (x) { return x.json(); });
     });
@@ -122,15 +127,15 @@
           key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: (plan === "pro" ? "Pro" : "Plus") + " - 30 days",
           order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#22d3ee" },
           handler: function (resp) {
-            err(document.documentElement.lang === "en" ? "Checking your payment..." : "भुगतान जाँच रहे हैं...");
+            err(hl("Checking your payment...", "पेमेंट जाँच रहे हैं...", "পেমেন্ট যাচাই হচ্ছে..."));
             fn("verify", resp).then(function (v) {
-              if (v && v.ok) { err(document.documentElement.lang === "en" ? "Done! Your plan is active. Open the app." : "हो गया! आपका प्लान चालू है। ऐप खोलो।"); reload(); }
-              else err((v && v.error) || (document.documentElement.lang === "en" ? "Payment received but not confirmed yet. It will switch on by itself, or send us the Payment ID below." : "भुगतान मिला पर पक्का नहीं हुआ। अपने आप चालू हो जाएगा, या नीचे Payment ID भेजो।"));
+              if (v && v.ok) { err(hl("Done! Your plan is active. Open the app.", "हो गया! आपका प्लान चालू है। ऐप खोलिए।", "হয়ে গেছে! আপনার প্ল্যান চালু। অ্যাপ খুলুন।")); reload(); }
+              else err((v && v.error) || hl("Payment received but not confirmed yet. It will switch on by itself, or send us the Payment ID below.", "पेमेंट मिला पर अभी पक्का नहीं हुआ। वह अपने-आप चालू हो जाएगा, या नीचे पेमेंट ID भेजिए।", "পেমেন্ট পাওয়া গেছে কিন্তু এখনও নিশ্চিত হয়নি। নিজে থেকেই চালু হয়ে যাবে, অথবা নিচে পেমেন্ট ID পাঠান।"));
             });
           }
         });
         rz.open();
-      }).catch(function () { err("Payment window could not open."); });
+      }).catch(function () { err(hl("Payment window could not open.", "पेमेंट की विंडो नहीं खुल सकी।", "পেমেন্ট উইন্ডো খোলা যায়নি।")); });
     });
   };
   window.payalClaim = function (id) {

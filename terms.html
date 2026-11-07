@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -16,37 +16,70 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
-
-<link rel="stylesheet" href="assets/helpbot.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-call" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol></defs></svg>
+<div class="offerbar" id="offerbar" hidden><svg class="i" aria-hidden="true"><use href="#i-spark"/></svg> <span><b>Diwali offer:</b> Plus <b data-p="plus">&#8377;49</b> &middot; Pro <b data-p="pro">&#8377;99</b></span><span class="ofsep">&middot;</span><span>ends in <b class="cd" data-cd="hms" data-noi18n>--:--:--</b></span></div>
 <header class="nav"><div class="wrap">
-<a class="brand" href="index.html"><img src="assets/favicon.png" alt="Payal"><span>Payal</span></a>
-<a class="btn ghost sm" id="swap" href="admin.html" hidden>&#128736; Admin</a>
-<button class="burger" id="burger" aria-label="Menu">☰</button>
+<a class="brand" href="index.html"><span class="logo"><img src="assets/favicon.png" alt="Payal"></span><span class="bt"><b>Payal</b></span></a>
+<a class="btn ghost sm" id="swap" href="admin.html" hidden>Admin</a>
+<button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span class="b-open"><svg class="i" aria-hidden="true"><use href="#i-menu"/></svg></span><span class="b-close"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></span></button>
 <nav class="links" id="links">
-<a class="l" href="index.html#features"><span class="hi">फ़ीचर</span><span class="en">Features</span></a>
-<a class="l" href="index.html#plans"><span class="hi">प्लान</span><span class="en">Plans</span></a>
-<a class="l" href="index.html#how"><span class="hi">कैसे चलता है</span><span class="en">How it works</span></a>
-<a class="l" href="index.html#faq"><span class="hi">सवाल-जवाब</span><span class="en">FAQ</span></a><a class="l" href="help.html"><span class="hi">मदद</span><span class="en">Help</span></a>
-<a class="l" href="index.html#creator"><span class="hi">बनाने वाले</span><span class="en">Creator</span></a>
-<a class="l" href="account.html"><span class="hi">👤 अकाउंट</span><span class="en">👤 Account</span></a>
-<button class="lang" id="langBtn" type="button">English</button>
-<a class="btn primary sm" data-apk href="#"><span class="hi">⬇ डाउनलोड</span><span class="en">⬇ Download</span></a>
+<div class="mlabel">Product</div>
+<a class="l pr" href="index.html#plans"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg> Payal for Android</a>
+<a class="l" href="index.html#features">Features</a>
+<a class="l" href="index.html#plans">Pricing</a>
+<a class="l" href="index.html#faq">FAQ</a>
+<a class="l" href="index.html#about">About</a>
+<div class="acct" id="acct" hidden><span class="av" id="acctav">A</span><span class="an" id="acctname"></span></div>
+<a class="l" id="m-dash" href="account.html">Log in</a>
+<a class="l" href="help.html">Setup guide</a>
+<a class="l out" id="m-out" href="#" hidden>Log out</a>
 </nav></div></header>
-<main class="doc"><h1><span class="hi">उपयोग की शर्तें</span><span class="en">Terms of Use</span></h1><div class="upd"><span class="hi">आख़िरी बदलाव</span><span class="en">Last updated</span>: 31 October 2026</div><h2><span class="hi">सेवा क्या है</span><span class="en">The service</span></h2><div><span class="hi"><p>Payal एक AI साथी ऐप है। AI के जवाब गलत या अधूरे हो सकते हैं। ज़रूरी फ़ैसलों (सेहत, कानून, पैसा) के लिए सिर्फ़ इन्हीं पर भरोसा न करें।</p></span><span class="en"><p>Payal is an AI companion app. AI replies can be wrong or incomplete. Do not rely on them alone for important decisions (health, law, money).</p></span></div><h2><span class="hi">खाता और फ़ोन</span><span class="en">Account and phone</span></h2><div><span class="hi"><p>एक Gmail एक समय पर एक ही फ़ोन में चल सकता है। फ़ोन बदलने पर नया फ़ोन 7 दिन बाद चालू होता है। खाता या प्लान बेचना, साझा करना या ऐप में हेराफेरी करना मना है, और ऐसा होने पर खाता रोका जा सकता है।</p></span><span class="en"><p>One Gmail can run on one phone at a time. A new phone activates after 7 days. Selling or sharing accounts or plans, or tampering with the app, is not allowed and may lead to suspension.</p></span></div><h2><span class="hi">प्लान और भुगतान</span><span class="en">Plans and payment</span></h2><div><span class="hi"><p>Plus और Pro प्लान 30 दिन के हैं और अपने आप दोबारा नहीं कटते। प्लान ख़त्म होने पर खाता Free हो जाता है। Free में रोज़ कुल 10 मिनट मिलते हैं। दाम और छूट समय-समय पर बदल सकते हैं, पर जो प्लान आप ले चुके हो उसकी अवधि पर असर नहीं पड़ता।</p></span><span class="en"><p>Plus and Pro plans last 30 days and never renew automatically. When a plan ends the account becomes Free. Free gives 10 minutes in total per day. Prices and offers may change, but a plan you already bought keeps its period.</p></span></div><h2><span class="hi">आपकी API key</span><span class="en">Your API key</span></h2><div><span class="hi"><p>AI का इस्तेमाल आपकी अपनी API key से होता है, इसलिए उसकी सीमाएँ और शर्तें Google की होती हैं। ऐप की तरफ़ से कोई समय-सीमा न होने का मतलब यह नहीं कि आपकी key की सीमा हट जाएगी।</p></span><span class="en"><p>AI use runs on your own API key, so its limits and terms are Google's. No time limit from the app does not remove the limits of your key.</p></span></div><h2><span class="hi">ज़िम्मेदारी</span><span class="en">Liability</span></h2><div><span class="hi"><p>सेवा “जैसी है वैसी” दी जाती है। फ़ोन कंट्रोल जैसे काम आप खुद चुनकर, अपनी ज़िम्मेदारी पर चलाते हो। कानून जितनी छूट देता है, उससे ज़्यादा नुकसान की ज़िम्मेदारी हम पर नहीं होगी।</p></span><span class="en"><p>The service is provided “as is”. Jobs like phone control are chosen and run by you at your own responsibility. To the extent the law allows, we are not liable for further loss.</p></span></div></main><footer><div class="wrap">
-<div class="fgrid">
-<div><a class="brand" href="index.html"><img src="assets/favicon.png" alt="Payal"><span>Payal</span></a>
-<p style="color:var(--muted);margin-top:12px;max-width:340px;font-size:14.5px"><span class="hi">आपकी अपनी AI साथी: बोलकर और लिखकर बात, कैमरा और फ़ोन का काम।</span><span class="en">Your own AI companion: talk and chat, camera and phone control.</span></p></div>
-<div><h4><span class="hi">उत्पाद</span><span class="en">Product</span></h4><a href="index.html#plans"><span class="hi">प्लान</span><span class="en">Plans</span></a><a href="index.html#download"><span class="hi">डाउनलोड</span><span class="en">Download</span></a><a href="index.html#faq"><span class="hi">सवाल-जवाब</span><span class="en">FAQ</span></a><a href="contact.html"><span class="hi">संपर्क</span><span class="en">Contact</span></a><a href="help.html"><span class="hi">इंस्टॉल मदद</span><span class="en">Install help</span></a></div>
-<div><h4><span class="hi">नियम</span><span class="en">Legal</span></h4><a href="privacy.html"><span class="hi">प्राइवेसी पॉलिसी</span><span class="en">Privacy Policy</span></a><a href="terms.html"><span class="hi">उपयोग की शर्तें</span><span class="en">Terms of Use</span></a><a href="refund.html"><span class="hi">रिफ़ंड नीति</span><span class="en">Refund Policy</span></a></div>
+<main class="doc"><h1>Terms of Use</h1><div class="upd">Last updated: 31 October 2026</div><h2>The service</h2><div><p>Payal is an AI companion app. AI replies can be wrong or incomplete. Do not rely on them alone for important decisions (health, law, money).</p></div><h2>Account and phone</h2><div><p>One Gmail can run on one phone at a time. A new phone activates after 7 days. Selling or sharing accounts or plans, or tampering with the app, is not allowed and may lead to suspension.</p></div><h2>Plans and payment</h2><div><p>Plus and Pro plans last 30 days and never renew automatically. When a plan ends the account becomes Free. Free gives 10 minutes in total per day. Prices and offers may change, but a plan you already bought keeps its period.</p></div><h2>Your API key</h2><div><p>AI use runs on your own API key, so its limits and terms are Google's. No time limit from the app does not remove the limits of your key.</p></div><h2>Liability</h2><div><p>The service is provided “as is”. Jobs like phone control are chosen and run by you at your own responsibility. To the extent the law allows, we are not liable for further loss.</p></div></main><footer><div class="wrap"><div class="footouter"><div class="footin">
+<a class="brand fbrand" href="index.html"><span class="logo"><img src="assets/favicon.png" alt="Payal"></span><span class="bt"><b>Payal</b></span></a>
+<p class="fdesc">An AI voice companion for your Android phone that talks, sees through the camera and helps with your phone. Built in India.</p>
+<div class="soc">
+<a href="sms:+919321109411" aria-label="Message"><svg class="i" aria-hidden="true"><use href="#i-chat"/></svg></a>
+<a href="tel:+919321109411" aria-label="Call"><svg class="i" aria-hidden="true"><use href="#i-call"/></svg></a>
+<a data-mail href="contact.html" aria-label="Email"><svg class="i" aria-hidden="true"><use href="#i-mail"/></svg></a>
 </div>
-<div class="copy"><span>© <span data-year></span> Payal. <span class="hi">सर्वाधिकार सुरक्षित।</span><span class="en">All rights reserved.</span></span><span><span class="hi">भवानीपुर, पाकुड़, झारखंड में बना ❤</span><span class="en">Made with ❤ in Pakur, Jharkhand</span></span></div>
-</div></footer>
+<a class="fline" href="tel:+919321109411"><svg class="i" aria-hidden="true"><use href="#i-call"/></svg> Call us +91 93211 09411</a>
+<div class="fcols">
+<div><h4>Product</h4><a href="index.html#plans">Payal for Android</a><a href="index.html#features">Features</a><a href="index.html#plans">Pricing</a><a href="help.html">Setup guide</a></div>
+<div><h4>Company</h4><a href="index.html#about">About</a><a href="index.html#faq">FAQ</a><a href="contact.html">Contact</a><a href="account.html">Dashboard</a></div>
+</div>
+<div class="flegal"><h4>Legal</h4><a href="terms.html">Terms &amp; conditions</a><a href="privacy.html">Privacy policy</a><a href="refund.html">Cancellation &amp; refund</a></div>
+<div class="addrcard"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg><div class="at">Md Asmaul &mdash; Bhawanipur, Pakur, Jharkhand, India</div><div class="ap">+91 93211 09411</div></div>
+<div class="festive"><svg class="i" aria-hidden="true"><use href="#i-spark"/></svg> Shubh Deepawali <svg class="i" aria-hidden="true"><use href="#i-spark"/></svg></div>
+<div class="copycard"><span>&copy; <span data-year></span> Payal. All rights reserved.</span><span>Made with care in India.</span></div>
+</div></div></div></footer>
 <script src="assets/config.js"></script>
+<script src="assets/i18n-data.js"></script>
+<script src="assets/i18n.js"></script>
 <script src="assets/app.js"></script>
-
-<script src="assets/helpbot.js" defer></script>
+<script src="assets/home.js"></script>
 </body></html>

@@ -27,10 +27,10 @@
       bn: "নমস্কার! Payal অ্যাপ বা এই ওয়েবসাইট নিয়ে যা খুশি জিজ্ঞাসা করো। নিচের প্রশ্নগুলোতেও চাপ দিতে পারো।"
     },
     none: {
-      hi: "मैं सिर्फ़ Payal ऐप और इस वेबसाइट के बारे में मदद कर सकता हूँ। यह सवाल मेरे पास नहीं है, हमने इसे नोट कर लिया है ताकि जल्दी जवाब जोड़ सकें। नीचे से कोई सवाल चुनो या WhatsApp करो: [[WhatsApp|" + WA + "]]",
-      rh: "Main sirf Payal app aur is website ke baare mein madad kar sakta hoon. Yeh sawaal mere paas nahi hai, humne ise note kar liya hai taaki jaldi jawaab jod sakein. Neeche se koi sawaal chuno ya WhatsApp karo: [[WhatsApp|" + WA + "]]",
-      en: "I can only help with the Payal app and this website. I don't have this one yet, and we have noted it so we can add an answer soon. Pick a question below or message us on WhatsApp: [[WhatsApp|" + WA + "]]",
-      bn: "আমি শুধু Payal অ্যাপ আর এই ওয়েবসাইট নিয়ে সাহায্য করতে পারি। এই প্রশ্নটা আমার কাছে নেই, আমরা এটা নোট করে রেখেছি যাতে তাড়াতাড়ি উত্তর যোগ করতে পারি। নিচ থেকে একটা প্রশ্ন বেছে নাও বা WhatsApp করো: [[WhatsApp|" + WA + "]]"
+      hi: "मैं सिर्फ़ Payal ऐप और इस वेबसाइट के बारे में मदद कर सकता हूँ। यह सवाल मेरे पास नहीं है, हमने इसे नोट कर लिया है ताकि जल्दी जवाब जोड़ सकें। नीचे से कोई सवाल चुनो या WhatsApp करो: +91 93211 09411",
+      rh: "Main sirf Payal app aur is website ke baare mein madad kar sakta hoon. Yeh sawaal mere paas nahi hai, humne ise note kar liya hai taaki jaldi jawaab jod sakein. Neeche se koi sawaal chuno ya WhatsApp karo: +91 93211 09411",
+      en: "I can only help with the Payal app and this website. I don't have this one yet, and we have noted it so we can add an answer soon. Pick a question below or call us on: +91 93211 09411",
+      bn: "আমি শুধু Payal অ্যাপ আর এই ওয়েবসাইট নিয়ে সাহায্য করতে পারি। এই প্রশ্নটা আমার কাছে নেই, আমরা এটা নোট করে রেখেছি যাতে তাড়াতাড়ি উত্তর যোগ করতে পারি। নিচ থেকে একটা প্রশ্ন বেছে নাও বা WhatsApp করো: +91 93211 09411"
     }
   };
 
@@ -75,10 +75,10 @@
       } },
     { img: null,
       x: {
-        hi: "अगर पहले से Payal या Yesmin का पुराना ऐप फ़ोन में है और “App not installed” आए, तो पुराना ऐप हटाकर (uninstall) फिर नया install करो। हटाने से पहले अपनी API key कहीं सहेज लो, क्योंकि ऐप में दोबारा डालनी पड़ सकती है। फिर भी न हो तो WhatsApp करो: [[WhatsApp|" + WA + "]]",
-        rh: "Agar pehle se Payal ya Yesmin ka purana app phone mein hai aur “App not installed” aaye, to purana app hatakar (uninstall) phir naya install karo. Hatane se pehle apni API key kahin sahej lo, kyunki app mein dobara daalni pad sakti hai. Phir bhi na ho to WhatsApp karo: [[WhatsApp|" + WA + "]]",
-        en: "If an old Payal or Yesmin app is already on the phone and “App not installed” appears, uninstall the old app and install the new one. Save your API key somewhere first, because you may have to enter it again. If it still fails, message us on WhatsApp: [[WhatsApp|" + WA + "]]",
-        bn: "ফোনে আগে থেকে Payal বা Yesmin-এর পুরনো অ্যাপ থাকলে আর “App not installed” এলে পুরনো অ্যাপ মুছে (uninstall) নতুনটা ইনস্টল করো। মোছার আগে তোমার API key কোথাও লিখে রাখো, কারণ অ্যাপে আবার দিতে হতে পারে। তবুও না হলে WhatsApp করো: [[WhatsApp|" + WA + "]]"
+        hi: "अगर पहले से Payal या Yesmin का पुराना ऐप फ़ोन में है और “App not installed” आए, तो पुराना ऐप हटाकर (uninstall) फिर नया install करो। हटाने से पहले अपनी API key कहीं सहेज लो, क्योंकि ऐप में दोबारा डालनी पड़ सकती है। फिर भी न हो तो WhatsApp करो: +91 93211 09411",
+        rh: "Agar pehle se Payal ya Yesmin ka purana app phone mein hai aur “App not installed” aaye, to purana app hatakar (uninstall) phir naya install karo. Hatane se pehle apni API key kahin sahej lo, kyunki app mein dobara daalni pad sakti hai. Phir bhi na ho to WhatsApp karo: +91 93211 09411",
+        en: "If an old Payal or Yesmin app is already on the phone and “App not installed” appears, uninstall the old app and install the new one. Save your API key somewhere first, because you may have to enter it again. If it still fails, call us on: +91 93211 09411",
+        bn: "ফোনে আগে থেকে Payal বা Yesmin-এর পুরনো অ্যাপ থাকলে আর “App not installed” এলে পুরনো অ্যাপ মুছে (uninstall) নতুনটা ইনস্টল করো। মোছার আগে তোমার API key কোথাও লিখে রাখো, কারণ অ্যাপে আবার দিতে হতে পারে। তবুও না হলে WhatsApp করো: +91 93211 09411"
       } }
   ];
 
@@ -300,7 +300,7 @@
   function el(tag, cls, html) { var n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; }
 
   /* ---------- state ---------- */
-  var lang = ls(true, LK) || "hi";
+  var lang = "en";
   if (!UI.intro[lang]) lang = "hi";
   var hist = [];
   try { hist = JSON.parse(ls(true, HK) || "[]"); if (!Array.isArray(hist)) hist = []; } catch (e) { hist = []; }

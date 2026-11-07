@@ -4,7 +4,7 @@
   if (!cv) return;
   var ctx = cv.getContext("2d");
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
-  var S = 0, ang = 0, hue = 175, speed = 0.18, target = 0.18, boost = 0, last = 0;
+  var S = 0, ang = 0, hue = 38, speed = 0.18, target = 0.18, boost = 0, last = 0;
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function size() {
     var r = cv.getBoundingClientRect();

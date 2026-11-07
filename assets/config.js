@@ -5,7 +5,11 @@ window.PAYAL = {
   apkSize: "64 MB",
   apkSha256: "0ea9ec2e125b321fe9633e609631c1d5a4e1d7df066bc4abcae243642a7d770a",
   whatsapp: "919321109411",
+  email: "asmaulsheikh47364@gmail.com",
   paymentsLive: false,
+  /* Offer countdown: change this date to end the offer sooner or later. Empty string hides every countdown. */
+  offerName: "Shubh Deepawali",
+  offerEnds: "2026-11-10T23:59:59+05:30",
   supabaseUrl: "https://hwfifqyssabwwdjlbqty.supabase.co",
   supabaseAnonKey: "sb_publishable_p_qIHrnCIUqRK7l-rkDhRw_r-O0yIWW",
   plans: [
