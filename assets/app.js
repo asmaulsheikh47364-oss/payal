@@ -11,7 +11,20 @@
   }
 
   /* links from config */
-  $$("[data-apk]").forEach(function (a) { a.href = C.apkUrl || "#"; });
+  /* the site opens for everyone; only the app download asks for a Gmail login first */
+  function loggedIn() {
+    try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (/^sb-.*-auth-token$/.test(k) && localStorage.getItem(k)) return true; } } catch (e) {}
+    return false;
+  }
+  $$("[data-apk]").forEach(function (a) {
+    a.href = C.apkUrl || "#";
+    a.addEventListener("click", function (e) {
+      if (loggedIn()) return;
+      e.preventDefault();
+      try { sessionStorage.setItem("payal_dl", "1"); } catch (x) {}
+      location.href = "account.html?dl=1";
+    });
+  });
   $$("[data-wa]").forEach(function (a) {
     var msg = a.getAttribute("data-wa") || "Namaste, mujhe Payal ke baare mein poochna hai.";
     a.href = "https://wa.me/" + (C.whatsapp || "") + "?text=" + encodeURIComponent(msg);

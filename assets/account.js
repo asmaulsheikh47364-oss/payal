@@ -15,6 +15,7 @@
   var sb = window.supabase.createClient(C.supabaseUrl, C.supabaseAnonKey, { auth: { persistSession: true, detectSessionInUrl: true } });
   $("#gbtn").addEventListener("click", function () {
     err("");
+    if (/[?&]dl=1/.test(location.search)) { try { sessionStorage.setItem("payal_dl", "1"); } catch (e) {} }
     sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } })
       .then(function (r) { if (r.error) err(r.error.message); });
   });
@@ -35,8 +36,7 @@
     $("#tier").textContent = tier === "pro" ? "Pro" : tier === "plus" ? "Plus" : "Free";
     $("#texp").textContent = tier === "free" ? hl("Free forever", "हमेशा मुफ़्त", "সবসময় বিনামূল্যে") : hl("Active until " + dtl(st.expires_at), "चालू है: " + dtl(st.expires_at) + " तक", "চালু আছে: " + dtl(st.expires_at) + " পর্যন্ত");
     if (tier === "free") {
-      var s = st.free_seconds_left || 0;
-      $("#free").textContent = Math.floor(s / 60) + ":" + two(s % 60);
+      $("#free").textContent = hl("No limit", "कोई सीमा नहीं", "কোনো সীমা নেই");
     } else {
       $("#free").textContent = hl("No app limit", "कोई सीमा नहीं", "কোনো সীমা নেই");
     }
@@ -52,6 +52,9 @@
     $("#giftopen").hidden = locked;
     if (!locked) { var tn = tier === "pro" ? "Pro" : "Plus"; $("#gifttitle").textContent = hl("Your " + tn + " app is ready", "आपका " + tn + " ऐप तैयार है", "আপনার " + tn + " অ্যাপ তৈরি"); }
     show("me");
+    try {
+      if (sessionStorage.getItem("payal_dl") === "1") { sessionStorage.removeItem("payal_dl"); var g = $("#gift"); if (g) g.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    } catch (e) {}
   }
   function load(session) {
     if (!session) { show("login"); return; }
