@@ -113,7 +113,6 @@
       st.textContent = L3("You already have " + PN + ". Buying again adds 30 more days.", "आपके पास " + PN + " पहले से है। फिर खरीदने पर 30 दिन और जुड़ेंगे।", "আপনার " + PN + " আগেই আছে। আবার কিনলে আরও ৩০ দিন যোগ হবে।");
     }
     card.appendChild(el("p", "pnote", L3("30 days, never renews by itself. One Gmail, one phone.", "30 दिन चलता है, अपने-आप दोबारा नहीं कटता। एक Gmail, एक फ़ोन।", "৩০ দিন চলে, নিজে থেকে আর কাটে না। এক Gmail, এক ফোন।")));
-    card.appendChild(qrSection());
     var bn = banner();
     if (bn) box.appendChild(bn);
     box.appendChild(card);
@@ -158,7 +157,7 @@
     fn("qr", { plan: plan }).then(function (q) {
       area.textContent = "";
       if (!q) return;
-      if (q.error) { area.appendChild(el("div", "pstat err", L3("QR is not available right now. Please use the Buy button above.", "QR अभी उपलब्ध नहीं है। कृपया ऊपर वाला Buy बटन इस्तेमाल कीजिए।", "QR এখন পাওয়া যাচ্ছে না। উপরের Buy বোতাম ব্যবহার করুন।"))); return; }
+      if (q.error) { var em = el("div", "pstat err", L3("QR is not available right now. Please use the Buy button above.", "QR अभी उपलब्ध नहीं है। कृपया ऊपर वाला Buy बटन इस्तेमाल कीजिए।", "QR এখন পাওয়া যাচ্ছে না। উপরের Buy বোতাম ব্যবহার করুন।")); if (q.detail) { em.appendChild(document.createElement("br")); em.appendChild(el("small", "", String(q.detail))); } area.appendChild(em); return; }
       var img = el("img", "qrimg"); img.alt = "UPI QR"; img.src = q.image_url; area.appendChild(img);
       var amt = el("div", "qramt", "\u20b9" + q.amount); area.appendChild(amt);
       var cd = el("div", "qrcd"); area.appendChild(cd);
@@ -227,18 +226,17 @@
         return fn("order", { plan: plan }).then(function (o) {
           if (!o) { busy(false); return; }
           if (o.error) { busy(false); stat("err", String(o.error)); return; }
-          return loadRzp().then(function () {
-            busy(false);
-            var rz = new window.Razorpay({
-              key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + " - 30 days",
-              order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#f0ac2e" },
-              redirect: true,
-              callback_url: C.supabaseUrl + "/functions/v1/pay/callback",
-              cancel_url: location.origin + "/plan.html?plan=" + plan + "&pay=cancel"
-            });
-            stat("info", L3("Opening the full payment page...", "पूरा पेमेंट पेज खुल रहा है...", "পূর্ণ পেমেন্ট পেজ খুলছে..."));
-            rz.open();
-          }).catch(function () { busy(false); stat("err", L3("Payment window could not open. Check your internet and try again.", "पेमेंट की विंडो नहीं खुल सकी। इंटरनेट देखकर फिर कोशिश कीजिए।", "পেমেন্ট উইন্ডো খোলা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।")); });
+          busy(false);
+          stat("info", L3("Opening the full payment page...", "पूरा पेमेंट पेज खुल रहा है...", "পূর্ণ পেমেন্ট পেজ খুলছে..."));
+          var f = document.createElement("form");
+          f.method = "POST"; f.action = "https://api.razorpay.com/v1/checkout/embedded";
+          function add(n, v) { var i = document.createElement("input"); i.type = "hidden"; i.name = n; i.value = v; f.appendChild(i); }
+          add("key_id", o.key_id); add("order_id", o.order_id); add("name", "Payal"); add("description", PN + " - 30 days");
+          add("prefill[email]", o.email || ""); add("theme[color]", "#f0ac2e");
+          add("callback_url", C.supabaseUrl + "/functions/v1/pay/callback");
+          add("cancel_url", location.origin + "/plan.html?plan=" + plan + "&pay=cancel");
+          document.body.appendChild(f);
+          f.submit();
         });
       }).catch(function () { busy(false); stat("err", L3("Could not reach the server. Check your internet and try again.", "सर्वर तक नहीं पहुँच सके। इंटरनेट देखकर फिर कोशिश कीजिए।", "সার্ভারে পৌঁছানো যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।")); });
   }
