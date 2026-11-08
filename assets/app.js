@@ -28,12 +28,19 @@
     try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (/^sb-.*-auth-token$/.test(k) && localStorage.getItem(k)) return true; } } catch (e) {}
     return false;
   }
+  /* ask for Gmail right here (Google account chooser), no extra page in between */
+  function googleGo() {
+    if (!C.supabaseUrl) return false;
+    location.href = C.supabaseUrl + "/auth/v1/authorize?provider=google&prompt=select_account&redirect_to=" + encodeURIComponent(location.origin + "/account.html");
+    return true;
+  }
   $$("[data-apk]").forEach(function (a) {
     a.href = C.apkUrl || "#";
     a.addEventListener("click", function (e) {
       if (loggedIn()) return;
       e.preventDefault();
       try { sessionStorage.setItem("payal_dl", "1"); } catch (x) {}
+      if (googleGo()) return;
       location.href = "account.html?dl=1";
     });
   });
@@ -108,6 +115,10 @@
       e.preventDefault();
       var p = b.getAttribute("data-buy");
       if (p !== "plus" && p !== "pro") return;
+      if (!loggedIn()) {
+        try { sessionStorage.setItem("payal_plan", p); } catch (x) {}
+        if (googleGo()) return;
+      }
       location.href = "plan.html?plan=" + p;
     });
   });
