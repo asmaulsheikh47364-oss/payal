@@ -53,3 +53,16 @@
 /* menu: signed-in name and Gmail */
 .acct .acol{display:flex;flex-direction:column;min-width:0}
 .acct .amail{font-size:13px;color:#aeb6cf;word-break:break-all;margin-top:2px}
+
+/* QR and result banner on the plan page */
+.qrbox{margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14);display:grid;gap:10px}
+.qrbox h4{margin:0;font-size:17px;color:#fff}
+.qrhelp{margin:0;font-size:14px;color:#d8d0e2;line-height:1.55}
+.qrbtn{width:100%}
+.qrarea{display:grid;gap:8px;justify-items:center;margin-top:4px}
+.qrimg{width:min(260px,100%);height:auto;border-radius:16px;background:#fff;padding:10px}
+.qramt{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;color:#ffc766}
+.qrcd{font-size:13px;color:#cfc8d8;text-align:center}
+.pstat.big{padding:18px;text-align:center;margin:0 0 14px}
+.pstat .bigline{font-family:'Poppins',sans-serif;font-size:24px;font-weight:700;margin-bottom:6px}
+.pstat.big{font-size:16px}

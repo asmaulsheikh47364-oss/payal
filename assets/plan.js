@@ -71,6 +71,7 @@
 
   var current = null; /* status from web_status */
   function renderPlan() {
+    stopQr();
     var box = $("#pv"); box.textContent = "";
     $("#backtxt").textContent = L3("All plans", "सारे प्लान", "সব প্ল্যান");
     var card = el("div", "plan dw planbig");
@@ -112,8 +113,68 @@
       st.textContent = L3("You already have " + PN + ". Buying again adds 30 more days.", "आपके पास " + PN + " पहले से है। फिर खरीदने पर 30 दिन और जुड़ेंगे।", "আপনার " + PN + " আগেই আছে। আবার কিনলে আরও ৩০ দিন যোগ হবে।");
     }
     card.appendChild(el("p", "pnote", L3("30 days, never renews by itself. One Gmail, one phone.", "30 दिन चलता है, अपने-आप दोबारा नहीं कटता। एक Gmail, एक फ़ोन।", "৩০ দিন চলে, নিজে থেকে আর কাটে না। এক Gmail, এক ফোন।")));
+    card.appendChild(qrSection());
+    var bn = banner();
+    if (bn) box.appendChild(bn);
     box.appendChild(card);
     show("pv");
+  }
+
+  /* ---- result banner (after the full payment page sends the customer back) ---- */
+  var payParam = (/[?&]pay=(ok|failed|pending|cancel)/.exec(location.search) || [])[1] || "";
+  function successBox() {
+    var d = el("div", "pstat ok big");
+    d.appendChild(el("div", "bigline", "\u2705 Payment Successful"));
+    d.appendChild(el("div", "", L3("Verified. Your " + PN + " plan is now active. Open the app and log in with the same Gmail.", "पक्का हो गया। आपका " + PN + " प्लान अब चालू है। ऐप खोलकर उसी Gmail से लॉग इन कीजिए।", "যাচাই হয়েছে। আপনার " + PN + " প্ল্যান এখন চালু। অ্যাপ খুলে একই Gmail দিয়ে লগ ইন করুন।")));
+    var a = el("a", "plink", L3("Go to my account and download the app", "मेरा खाता खोलिए और ऐप डाउनलोड कीजिए", "আমার অ্যাকাউন্ট খুলুন ও অ্যাপ ডাউনলোড করুন")); a.href = "account.html"; d.appendChild(a);
+    return d;
+  }
+  function banner() {
+    if (paidNow) return successBox();
+    if (payParam === "ok") return successBox();
+    if (payParam === "pending") { var p = el("div", "pstat info", L3("Payment received. We are confirming it, your plan will switch on by itself in a moment.", "पेमेंट मिल गया। हम पक्का कर रहे हैं, प्लान थोड़ी देर में अपने-आप चालू हो जाएगा।", "পেমেন্ট পাওয়া গেছে। নিশ্চিত করা হচ্ছে, প্ল্যান একটু পরে নিজে থেকেই চালু হবে।")); p.style.marginBottom = "14px"; return p; }
+    if (payParam === "failed") { var f = el("div", "pstat err", L3("Payment did not complete. If money was cut, it will switch on by itself, or open your account and send us the Payment ID.", "पेमेंट पूरा नहीं हुआ। अगर पैसा कटा है तो प्लान अपने-आप चालू हो जाएगा, या खाता खोलकर पेमेंट ID भेजिए।", "পেমেন্ট সম্পূর্ণ হয়নি। টাকা কাটলে প্ল্যান নিজে থেকেই চালু হবে, নয়তো অ্যাকাউন্ট খুলে পেমেন্ট ID পাঠান।")); f.style.marginBottom = "14px"; return f; }
+    if (payParam === "cancel") { var c = el("div", "pstat info", L3("Payment cancelled. Tap Buy when you are ready.", "पेमेंट रद्द हुआ। तैयार हों तो फिर Buy दबाइए।", "পেমেন্ট বাতিল হয়েছে। তৈরি হলে আবার Buy চাপুন।")); c.style.marginBottom = "14px"; return c; }
+    return null;
+  }
+  var paidNow = false;
+
+  /* ---- scan-and-pay QR: new QR every 30 minutes, checks by itself when paid ---- */
+  var qrTick = null, qrPoll = null;
+  function stopQr() { clearInterval(qrTick); clearInterval(qrPoll); qrTick = null; qrPoll = null; }
+  function qrSection() {
+    var w = el("div", "qrbox");
+    w.appendChild(el("h4", "", L3("Or pay by scanning a QR", "या QR स्कैन करके पैसा दीजिए", "অথবা QR স্ক্যান করে টাকা দিন")));
+    w.appendChild(el("p", "qrhelp", L3("Tap the button, take a screenshot of the QR, open PhonePe or Google Pay, choose scan, and pick the screenshot from your gallery. The amount fills in by itself.", "बटन दबाइए, QR का स्क्रीनशॉट लीजिए, PhonePe या Google Pay खोलकर स्कैन चुनिए और गैलरी से वह स्क्रीनशॉट चुन लीजिए। रक़म अपने-आप भर जाएगी।", "বোতাম চাপুন, QR-এর স্ক্রিনশট নিন, PhonePe বা Google Pay খুলে স্ক্যান বেছে গ্যালারি থেকে স্ক্রিনশটটি নিন। টাকার অঙ্ক নিজে থেকেই বসে যাবে।")));
+    var b = el("button", "btn ghost qrbtn", L3("Show QR code", "QR कोड दिखाइए", "QR কোড দেখান")); b.type = "button"; b.addEventListener("click", showQr);
+    w.appendChild(b);
+    var area = el("div", "qrarea"); area.id = "qrarea"; w.appendChild(area);
+    return w;
+  }
+  function showQr() {
+    var area = $("#qrarea"); if (!area) return;
+    stopQr();
+    area.textContent = L3("Making your QR...", "आपका QR बन रहा है...", "আপনার QR তৈরি হচ্ছে...");
+    fn("qr", { plan: plan }).then(function (q) {
+      area.textContent = "";
+      if (!q) return;
+      if (q.error) { area.appendChild(el("div", "pstat err", L3("QR is not available right now. Please use the Buy button above.", "QR अभी उपलब्ध नहीं है। कृपया ऊपर वाला Buy बटन इस्तेमाल कीजिए।", "QR এখন পাওয়া যাচ্ছে না। উপরের Buy বোতাম ব্যবহার করুন।"))); return; }
+      var img = el("img", "qrimg"); img.alt = "UPI QR"; img.src = q.image_url; area.appendChild(img);
+      var amt = el("div", "qramt", "\u20b9" + q.amount); area.appendChild(amt);
+      var cd = el("div", "qrcd"); area.appendChild(cd);
+      function draw() {
+        var left = q.expires_at - Math.floor(Date.now() / 1000);
+        if (left <= 0) { stopQr(); showQr(); return; }
+        var m = Math.floor(left / 60), sec = left % 60;
+        cd.textContent = L3("This QR is valid for ", "यह QR चालू है ", "এই QR চালু আছে ") + (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec + L3(" more. A new one appears by itself.", " और। नया अपने-आप आ जाएगा।", " আরও। নতুন একটি নিজে থেকেই আসবে।");
+      }
+      draw(); qrTick = setInterval(draw, 1000);
+      qrPoll = setInterval(function () {
+        fn("status", { order_id: q.qr_id }).then(function (r) {
+          if (r && r.status === "paid") { stopQr(); paidNow = true; sb.rpc("web_status").then(function (x) { current = x && x.data ? x.data : current; }).catch(function () {}).then(renderPlan); try { window.scrollTo(0, 0); } catch (e) {} }
+        });
+      }, 4000);
+    });
   }
 
   function renderLogin() {
@@ -171,15 +232,11 @@
             var rz = new window.Razorpay({
               key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + " - 30 days",
               order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#f0ac2e" },
-              modal: { ondismiss: function () { stat("info", L3("Payment window closed. Tap Buy when you are ready.", "पेमेंट की विंडो बंद हो गई। तैयार हों तो फिर Buy दबाइए।", "পেমেন্ট উইন্ডো বন্ধ হয়েছে। তৈরি হলে আবার Buy চাপুন।")); } },
-              handler: function (resp) {
-                stat("info", L3("Checking your payment...", "पेमेंट जाँच रहे हैं...", "পেমেন্ট যাচাই হচ্ছে..."));
-                fn("verify", resp).then(function (v) {
-                  if (v && v.ok) { stat("ok", L3("Done! Your plan is active. Open the app and log in with the same Gmail.", "हो गया! आपका प्लान चालू है। ऐप खोलकर उसी Gmail से लॉग इन कीजिए।", "হয়ে গেছে! আপনার প্ল্যান চালু। অ্যাপ খুলে একই Gmail দিয়ে লগ ইন করুন।"), "account.html", L3("Go to my account and download the app", "मेरा खाता खोलिए और ऐप डाउनलोड कीजिए", "আমার অ্যাকাউন্ট খুলুন ও অ্যাপ ডাউনলোড করুন")); }
-                  else stat("err", (v && v.error) || L3("Payment received but not confirmed yet. It will switch on by itself, or open your account and send us the Payment ID.", "पेमेंट मिला पर अभी पक्का नहीं हुआ। वह अपने-आप चालू हो जाएगा, या खाता खोलकर पेमेंट ID भेजिए।", "পেমেন্ট পাওয়া গেছে কিন্তু এখনও নিশ্চিত হয়নি। নিজে থেকেই চালু হবে, নয়তো অ্যাকাউন্ট খুলে পেমেন্ট ID পাঠান।"), "account.html", L3("Open my account", "मेरा खाता खोलिए", "আমার অ্যাকাউন্ট খুলুন"));
-                });
-              }
+              redirect: true,
+              callback_url: C.supabaseUrl + "/functions/v1/pay/callback",
+              cancel_url: location.origin + "/plan.html?plan=" + plan + "&pay=cancel"
             });
+            stat("info", L3("Opening the full payment page...", "पूरा पेमेंट पेज खुल रहा है...", "পূর্ণ পেমেন্ট পেজ খুলছে..."));
             rz.open();
           }).catch(function () { busy(false); stat("err", L3("Payment window could not open. Check your internet and try again.", "पेमेंट की विंडो नहीं खुल सकी। इंटरनेट देखकर फिर कोशिश कीजिए।", "পেমেন্ট উইন্ডো খোলা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।")); });
         });
