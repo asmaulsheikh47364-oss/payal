@@ -40,7 +40,9 @@
   var m=u.user_metadata||{},name=m.full_name||m.name||(u.email||'').split('@')[0]||'Account';
   var acct=document.getElementById('acct');if(!acct)return;
   document.getElementById('acctav').textContent=(name.charAt(0)||'A').toUpperCase();
-  document.getElementById('acctname').textContent=name;acct.hidden=false;
+  var an=document.getElementById('acctname');an.textContent=name;
+  var col=document.createElement('span');col.className='acol';an.parentNode.insertBefore(col,an);col.appendChild(an);
+  var ml=document.createElement('small');ml.className='amail';ml.textContent=u.email||'';col.appendChild(ml);acct.hidden=false;
   var d=document.getElementById('m-dash');if(d){d.textContent=PT('Dashboard');document.addEventListener('payal:lang',function(){d.textContent=PT('Dashboard');});}
   var o=document.getElementById('m-out');
   if(o){o.hidden=false;o.addEventListener('click',function(ev){ev.preventDefault();

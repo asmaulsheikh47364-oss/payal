@@ -8,6 +8,18 @@
   if (bg && lk) {
     bg.addEventListener("click", function () { var o = lk.classList.toggle("open"); bg.classList.toggle("open", o); bg.setAttribute("aria-expanded", o ? "true" : "false"); });
     $$("#links a").forEach(function (a) { a.addEventListener("click", function () { lk.classList.remove("open"); bg.classList.remove("open"); }); });
+    /* tap anywhere outside the menu and it closes by itself */
+    function closeMenu() { lk.classList.remove("open"); bg.classList.remove("open"); bg.setAttribute("aria-expanded", "false"); }
+    document.addEventListener("click", function (e) {
+      if (!lk.classList.contains("open")) return;
+      if (lk.contains(e.target) || bg.contains(e.target)) return;
+      closeMenu();
+    });
+    document.addEventListener("touchstart", function (e) {
+      if (!lk.classList.contains("open")) return;
+      if (lk.contains(e.target) || bg.contains(e.target)) return;
+      closeMenu();
+    }, { passive: true });
   }
 
   /* links from config */
@@ -94,10 +106,16 @@
   $$("[data-buy]").forEach(function (b) {
     b.addEventListener("click", function (e) {
       e.preventDefault();
-      if (C.paymentsLive) { if (window.payalBuy) { window.payalBuy(b.getAttribute("data-buy")); return; } location.href = "account.html?plan=" + b.getAttribute("data-buy"); return; }
-      openModal(b.getAttribute("data-buy").toUpperCase());
+      var p = b.getAttribute("data-buy");
+      if (p !== "plus" && p !== "pro") return;
+      location.href = "plan.html?plan=" + p;
     });
   });
+  /* back from Google login with a plan chosen: go straight to that plan's page */
+  try {
+    var pp = sessionStorage.getItem("payal_plan");
+    if ((pp === "plus" || pp === "pro") && loggedIn() && !/account\.html|plan\.html/.test(location.pathname)) { sessionStorage.removeItem("payal_plan"); location.replace("plan.html?plan=" + pp); }
+  } catch (e) {}
   $$("[data-close]").forEach(function (b) { b.addEventListener("click", function () { modal.classList.remove("on"); }); });
   if (modal) modal.addEventListener("click", function (e) { if (e.target === modal) modal.classList.remove("on"); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && modal) modal.classList.remove("on"); });

@@ -19,7 +19,6 @@
     sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } })
       .then(function (r) { if (r.error) err(r.error.message); });
   });
-  $("#outbtn").addEventListener("click", function () { sb.auth.signOut().then(function () { show("login"); }); });
   function maskMail(e) {
     var i = e.indexOf("@");
     if (i < 3) return e;
@@ -29,12 +28,9 @@
   document.addEventListener("payal:lang", function () { if (lastR) render(lastR[0], lastR[1]); });
   function render(st, user) {
     lastR = [st, user];
-    var m = user.user_metadata || {};
-    $("#uname").textContent = m.full_name || m.name || "";
-    $("#uemail").textContent = maskMail(user.email || "");
     var tier = st.tier || "free";
     $("#tier").textContent = tier === "pro" ? "Pro" : tier === "plus" ? "Plus" : "Free";
-    $("#texp").textContent = tier === "free" ? hl("Free forever", "हमेशा मुफ़्त", "সবসময় বিনামূল্যে") : hl("Active until " + dtl(st.expires_at), "चालू है: " + dtl(st.expires_at) + " तक", "চালু আছে: " + dtl(st.expires_at) + " পর্যন্ত");
+    $("#texp").textContent = tier === "free" ? "" : hl("Active until " + dtl(st.expires_at), "चालू है: " + dtl(st.expires_at) + " तक", "চালু আছে: " + dtl(st.expires_at) + " পর্যন্ত");
     if (tier === "free") {
       $("#free").textContent = hl("No limit", "कोई सीमा नहीं", "কোনো সীমা নেই");
     } else {
@@ -58,6 +54,8 @@
   }
   function load(session) {
     if (!session) { show("login"); return; }
+    var pp = null; try { pp = sessionStorage.getItem("payal_plan"); } catch (e) {}
+    if (pp === "plus" || pp === "pro") { try { sessionStorage.removeItem("payal_plan"); } catch (e) {} location.replace("plan.html?plan=" + pp); return; }
     sb.rpc("web_status").then(function (r) {
       if (r.error) { err(r.error.message); show("login"); return; }
       render(r.data || {}, session.user);
@@ -112,48 +110,10 @@
         .then(function (x) { return x.json(); });
     });
   }
-  function loadRzp() {
-    return new Promise(function (ok, bad) {
-      if (window.Razorpay) { ok(); return; }
-      var t = document.createElement("script"); t.src = "https://checkout.razorpay.com/v1/checkout.js";
-      t.onload = ok; t.onerror = bad; document.head.appendChild(t);
-    });
-  }
   function reload() { sb.auth.getSession().then(function (r) { load(r.data && r.data.session); }); }
-  window.payalBuy = function (plan) {
-    err("");
-    fn("order", { plan: plan }).then(function (o) {
-      if (!o) return;
-      if (o.error) { err(o.error); return; }
-      loadRzp().then(function () {
-        var rz = new window.Razorpay({
-          key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: (plan === "pro" ? "Pro" : "Plus") + " - 30 days",
-          order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#22d3ee" },
-          handler: function (resp) {
-            err(hl("Checking your payment...", "पेमेंट जाँच रहे हैं...", "পেমেন্ট যাচাই হচ্ছে..."));
-            fn("verify", resp).then(function (v) {
-              if (v && v.ok) { err(hl("Done! Your plan is active. Open the app.", "हो गया! आपका प्लान चालू है। ऐप खोलिए।", "হয়ে গেছে! আপনার প্ল্যান চালু। অ্যাপ খুলুন।")); reload(); }
-              else err((v && v.error) || hl("Payment received but not confirmed yet. It will switch on by itself, or send us the Payment ID below.", "पेमेंट मिला पर अभी पक्का नहीं हुआ। वह अपने-आप चालू हो जाएगा, या नीचे पेमेंट ID भेजिए।", "পেমেন্ট পাওয়া গেছে কিন্তু এখনও নিশ্চিত হয়নি। নিজে থেকেই চালু হয়ে যাবে, অথবা নিচে পেমেন্ট ID পাঠান।"));
-            });
-          }
-        });
-        rz.open();
-      }).catch(function () { err(hl("Payment window could not open.", "पेमेंट की विंडो नहीं खुल सकी।", "পেমেন্ট উইন্ডো খোলা যায়নি।")); });
-    });
-  };
   window.payalClaim = function (id) {
     return fn("claim", { payment_id: id });
   };
-  (function () {
-    var m = /[?&]plan=(plus|pro)/.exec(location.search);
-    if (!m) return;
-    fetch(C.supabaseUrl + "/rest/v1/rpc/public_settings", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: "{}" })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        if (!d || d.payments_live !== true) return;
-        sb.auth.getSession().then(function (r) { if (r.data && r.data.session) window.payalBuy(m[1]); });
-      }).catch(function () {});
-  })();
   setup();
   sb.auth.getSession().then(function (r) { load(r.data && r.data.session); if (r.data && r.data.session) { mine(); adminLink(); } });
   sb.auth.onAuthStateChange(function (ev, session) { if (ev === "SIGNED_IN" || ev === "SIGNED_OUT") { load(session); if (session) { mine(); adminLink(); } } });

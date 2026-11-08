@@ -4,7 +4,7 @@ window.PAYAL = {
   apkVersion: "v57",
   apkSize: "65 MB",
   apkSha256: "928578b52f824a6e08e158eab9ff8956e30894bd5d78dcaa51be9b73df16f001",
-  whatsapp: "919321109411",
+  whatsapp: "",
   email: "asmaulsheikh47364@gmail.com",
   paymentsLive: false,
   /* Offer countdown: change this date to end the offer sooner or later. Empty string hides every countdown. */

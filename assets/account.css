@@ -20,3 +20,36 @@
 .acplans .btn{width:100%}
 #swap{margin-left:2px;white-space:nowrap}
 .gift{border-color:rgba(240,172,46,.45)}
+
+/* small account info under the download card */
+.mini{margin-top:16px;padding:0 4px;font-size:13.5px;color:#aeb6cf;line-height:1.7}
+.mini p{margin:0}
+.mini .role{display:inline;font-size:11px;letter-spacing:.12em;margin:0 6px 0 0;color:var(--gold,#f0ac2e)}
+.mini b{font-weight:600;color:#d9deef}
+.mini .plink,.plink{color:#ffc766;text-decoration:underline;margin-right:14px;font-size:13.5px}
+
+/* plan page */
+.planpg{max-width:560px}
+.planpg .back{display:inline-block;margin:0 0 14px;color:#ffc766;font-size:15px}
+.planbig{padding:26px 22px 24px}
+.planbig .rows{list-style:none;margin:16px 0 22px;padding:0;display:grid;gap:11px}
+.planbig .rows li{display:flex;align-items:center;gap:12px;font-size:15.5px;color:#f3efe8}
+.planbig .rows li:before{content:none!important}
+.planbig .rows li .i{flex:0 0 auto;width:24px;height:24px;padding:4px;border-radius:50%;stroke-width:3}
+.planbig .rows li.yes .i{background:rgba(61,220,151,.18);color:#3ddc97;border:1px solid rgba(61,220,151,.4)}
+.planbig .rows li.no{color:#9a93a6}
+.planbig .rows li.no span{text-decoration:line-through;text-decoration-color:rgba(255,120,120,.55)}
+.planbig .rows li.no .i{background:rgba(255,95,95,.14);color:#ff7a7a;border:1px solid rgba(255,95,95,.4)}
+.planbig .psub{color:#d8d0e2;margin:6px 0 0;font-size:15px}
+.planbig .cta{width:100%;font-size:17px;padding:15px}
+.pstat{margin-top:14px;padding:13px 15px;border-radius:14px;font-size:15px;line-height:1.55;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:#f3efe8}
+.pstat.err{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.55);color:#ffd0d0}
+.pstat.ok{background:rgba(61,220,151,.14);border-color:rgba(61,220,151,.5);color:#c9f7e0}
+.pstat.info{background:rgba(240,172,46,.12);border-color:rgba(240,172,46,.45);color:#ffe2aa}
+.planbig .pnote{margin:14px 0 0;font-size:13px;color:#b9b2c6;text-align:center}
+.planbig .cdh{font-family:'Poppins',sans-serif;font-size:22px;color:#ffc766;margin-left:8px}
+.planbig .plan-cd{margin:4px 0 8px}
+
+/* menu: signed-in name and Gmail */
+.acct .acol{display:flex;flex-direction:column;min-width:0}
+.acct .amail{font-size:13px;color:#aeb6cf;word-break:break-all;margin-top:2px}

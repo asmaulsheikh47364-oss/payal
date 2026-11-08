@@ -4,7 +4,7 @@
   if (window.__pbhLoaded) return;
   window.__pbhLoaded = true;
 
-  var WA = "https://wa.me/919321109411";
+  var WA = "contact.html";
   var LK = "pbhLang", HK = "pbhChat";
 
   /* ---------- screen text ---------- */
@@ -27,10 +27,10 @@
       bn: "নমস্কার! Payal অ্যাপ বা এই ওয়েবসাইট নিয়ে যা খুশি জিজ্ঞাসা করো। নিচের প্রশ্নগুলোতেও চাপ দিতে পারো।"
     },
     none: {
-      hi: "मैं सिर्फ़ Payal ऐप और इस वेबसाइट के बारे में मदद कर सकता हूँ। यह सवाल मेरे पास नहीं है, हमने इसे नोट कर लिया है ताकि जल्दी जवाब जोड़ सकें। नीचे से कोई सवाल चुनो या WhatsApp करो: +91 93211 09411",
-      rh: "Main sirf Payal app aur is website ke baare mein madad kar sakta hoon. Yeh sawaal mere paas nahi hai, humne ise note kar liya hai taaki jaldi jawaab jod sakein. Neeche se koi sawaal chuno ya WhatsApp karo: +91 93211 09411",
-      en: "I can only help with the Payal app and this website. I don't have this one yet, and we have noted it so we can add an answer soon. Pick a question below or call us on: +91 93211 09411",
-      bn: "আমি শুধু Payal অ্যাপ আর এই ওয়েবসাইট নিয়ে সাহায্য করতে পারি। এই প্রশ্নটা আমার কাছে নেই, আমরা এটা নোট করে রেখেছি যাতে তাড়াতাড়ি উত্তর যোগ করতে পারি। নিচ থেকে একটা প্রশ্ন বেছে নাও বা WhatsApp করো: +91 93211 09411"
+      hi: "मैं सिर्फ़ Payal ऐप और इस वेबसाइट के बारे में मदद कर सकता हूँ। यह सवाल मेरे पास नहीं है, हमने इसे नोट कर लिया है ताकि जल्दी जवाब जोड़ सकें। नीचे से कोई सवाल चुनो",
+      rh: "Main sirf Payal app aur is website ke baare mein madad kar sakta hoon. Yeh sawaal mere paas nahi hai, humne ise note kar liya hai taaki jaldi jawaab jod sakein. Neeche se koi sawaal chuno",
+      en: "I can only help with the Payal app and this website. I don't have this one yet, and we have noted it so we can add an answer soon. Pick a question below",
+      bn: "আমি শুধু Payal অ্যাপ আর এই ওয়েবসাইট নিয়ে সাহায্য করতে পারি। এই প্রশ্নটা আমার কাছে নেই, আমরা এটা নোট করে রেখেছি যাতে তাড়াতাড়ি উত্তর যোগ করতে পারি। নিচ থেকে একটা প্রশ্ন বেছে নাও"
     }
   };
 
@@ -75,10 +75,10 @@
       } },
     { img: null,
       x: {
-        hi: "अगर पहले से Payal या Yesmin का पुराना ऐप फ़ोन में है और “App not installed” आए, तो पुराना ऐप हटाकर (uninstall) फिर नया install करो। हटाने से पहले अपनी API key कहीं सहेज लो, क्योंकि ऐप में दोबारा डालनी पड़ सकती है। फिर भी न हो तो WhatsApp करो: +91 93211 09411",
-        rh: "Agar pehle se Payal ya Yesmin ka purana app phone mein hai aur “App not installed” aaye, to purana app hatakar (uninstall) phir naya install karo. Hatane se pehle apni API key kahin sahej lo, kyunki app mein dobara daalni pad sakti hai. Phir bhi na ho to WhatsApp karo: +91 93211 09411",
-        en: "If an old Payal or Yesmin app is already on the phone and “App not installed” appears, uninstall the old app and install the new one. Save your API key somewhere first, because you may have to enter it again. If it still fails, call us on: +91 93211 09411",
-        bn: "ফোনে আগে থেকে Payal বা Yesmin-এর পুরনো অ্যাপ থাকলে আর “App not installed” এলে পুরনো অ্যাপ মুছে (uninstall) নতুনটা ইনস্টল করো। মোছার আগে তোমার API key কোথাও লিখে রাখো, কারণ অ্যাপে আবার দিতে হতে পারে। তবুও না হলে WhatsApp করো: +91 93211 09411"
+        hi: "अगर पहले से Payal या Yesmin का पुराना ऐप फ़ोन में है और “App not installed” आए, तो पुराना ऐप हटाकर (uninstall) फिर नया install करो। हटाने से पहले अपनी API key कहीं सहेज लो, क्योंकि ऐप में दोबारा डालनी पड़ सकती है। फिर भी न हो तो संपर्क पन्ने से लिखो।",
+        rh: "Agar pehle se Payal ya Yesmin ka purana app phone mein hai aur “App not installed” aaye, to purana app hatakar (uninstall) phir naya install karo. Hatane se pehle apni API key kahin sahej lo, kyunki app mein dobara daalni pad sakti hai. Phir bhi na ho to Sampark panne se likho.",
+        en: "If an old Payal or Yesmin app is already on the phone and “App not installed” appears, uninstall the old app and install the new one. Save your API key somewhere first, because you may have to enter it again. If it still fails, write to us from the Contact page.",
+        bn: "ফোনে আগে থেকে Payal বা Yesmin-এর পুরনো অ্যাপ থাকলে আর “App not installed” এলে পুরনো অ্যাপ মুছে (uninstall) নতুনটা ইনস্টল করো। মোছার আগে তোমার API key কোথাও লিখে রাখো, কারণ অ্যাপে আবার দিতে হতে পারে। তবুও না হলে যোগাযোগ পাতা থেকে লিখুন।"
       } }
   ];
 
@@ -143,10 +143,10 @@
     { id: "contact", img: [],
       k: ["contact", "whatsapp", "help number", "number", "phone number", "call", "support", "sampark", "madad chahiye", "owner", "developer", "creator", "baat karni", "human", "insaan", "संपर्क", "व्हाट्सएप", "व्हाट्सऐप", "नंबर", "सहायता", "मदद चाहिए", "যোগাযোগ", "হোয়াটসঅ্যাপ", "নম্বর", "সাপোর্ট", "সাহায্য"],
       a: {
-        hi: "सीधे बात करनी हो तो WhatsApp करो: [[WhatsApp|" + WA + "]] या [[संपर्क पन्ना|contact.html]]। अपने फ़ोन का नाम और दिख रही चेतावनी का स्क्रीनशॉट भेजना, हम ख़ुद मदद करेंगे।",
-        rh: "Seedhe baat karni ho to WhatsApp karo: [[WhatsApp|" + WA + "]] ya [[Sampark panna|contact.html]]. Apne phone ka naam aur dikh rahi chetavani ka screenshot bhejna, hum khud madad karenge.",
-        en: "To talk to us directly, message on WhatsApp: [[WhatsApp|" + WA + "]] or open the [[Contact page|contact.html]]. Send your phone's name and a screenshot of the warning you see, and we will help.",
-        bn: "সরাসরি কথা বলতে WhatsApp করো: [[WhatsApp|" + WA + "]] বা [[যোগাযোগ পাতা|contact.html]]। তোমার ফোনের নাম আর যে সতর্কতা দেখছ তার স্ক্রিনশট পাঠিও, আমরা নিজে সাহায্য করব।"
+        hi: "सीधे बात करनी हो तो [[संपर्क पन्ना|" + WA + "]] खोलो। अपने फ़ोन का नाम और दिख रही चेतावनी का स्क्रीनशॉट भेजना, हम ख़ुद मदद करेंगे।",
+        rh: "Seedhe baat karni ho to [[Sampark panna|" + WA + "]] kholo. Apne phone ka naam aur dikh rahi chetavani ka screenshot bhejna, hum khud madad karenge.",
+        en: "To talk to us directly, open the [[Contact page|" + WA + "]]. Send your phone's name and a screenshot of the warning you see, and we will help.",
+        bn: "সরাসরি কথা বলতে [[যোগাযোগ পাতা|" + WA + "]] খোলো। তোমার ফোনের নাম আর যে সতর্কতা দেখছ তার স্ক্রিনশট পাঠিও, আমরা নিজে সাহায্য করব।"
       } },
     { id: "safe", img: [],
       k: ["safe", "safe hai", "secure", "trust", "fake", "scam", "sure", "surakshit", "sahi hai", "bharosa", "भरोसा", "सुरक्षित", "असली", "नकली", "सेफ", "নিরাপদ", "বিশ্বাস", "সেফ"],
@@ -222,7 +222,7 @@
     { id: "blocked", t: { hi: "इंस्टॉल नहीं हो रहा", rh: "Install nahi ho raha", en: "Cannot install", bn: "ইনস্টল হচ্ছে না" } },
     { id: "apikey", t: { hi: "API key कैसे बनाएँ", rh: "API key kaise banayein", en: "How to get API key", bn: "API key কীভাবে বানাব" } },
     { id: "plans", t: { hi: "प्लान और कीमत", rh: "Plan aur keemat", en: "Plans and price", bn: "প্ল্যান ও দাম" } },
-    { id: "contact", t: { hi: "WhatsApp पर बात", rh: "WhatsApp par baat", en: "Talk on WhatsApp", bn: "WhatsApp-এ কথা" } }
+    { id: "contact", t: { hi: "संपर्क करें", rh: "Sampark karein", en: "Contact us", bn: "যোগাযোগ" } }
   ];
 
   /* ---------- matching ---------- */
