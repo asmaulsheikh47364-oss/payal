@@ -226,17 +226,22 @@
         return fn("order", { plan: plan }).then(function (o) {
           if (!o) { busy(false); return; }
           if (o.error) { busy(false); stat("err", String(o.error)); return; }
-          busy(false);
-          stat("info", L3("Opening the full payment page...", "पूरा पेमेंट पेज खुल रहा है...", "পূর্ণ পেমেন্ট পেজ খুলছে..."));
-          var f = document.createElement("form");
-          f.method = "POST"; f.action = "https://api.razorpay.com/v1/checkout/embedded";
-          function add(n, v) { var i = document.createElement("input"); i.type = "hidden"; i.name = n; i.value = v; f.appendChild(i); }
-          add("key_id", o.key_id); add("order_id", o.order_id); add("name", "Payal"); add("description", PN + " - 30 days");
-          add("prefill[email]", o.email || ""); add("theme[color]", "#f0ac2e");
-          add("callback_url", C.supabaseUrl + "/functions/v1/pay/callback");
-          add("cancel_url", location.origin + "/plan.html?plan=" + plan + "&pay=cancel");
-          document.body.appendChild(f);
-          f.submit();
+          return loadRzp().then(function () {
+            busy(false);
+            var rz = new window.Razorpay({
+              key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + " - 30 days",
+              order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#f0ac2e" },
+              modal: { ondismiss: function () { stat("info", L3("Payment window closed. Tap Buy when you are ready.", "पेमेंट की विंडो बंद हो गई। तैयार हों तो फिर Buy दबाइए।", "পেমেন্ট উইন্ডো বন্ধ হয়েছে। তৈরি হলে আবার Buy চাপুন।")); } },
+              handler: function (resp) {
+                stat("info", L3("Checking your payment...", "पेमेंट जाँच रहे हैं...", "পেমেন্ট যাচাই হচ্ছে..."));
+                fn("verify", resp).then(function (v) {
+                  if (v && v.ok) { paidNow = true; current = { tier: plan }; renderPlan(); try { window.scrollTo(0, 0); } catch (e) {} }
+                  else stat("err", (v && v.error) || L3("Payment received but not confirmed yet. It will switch on by itself, or open your account and send us the Payment ID.", "पेमेंट मिला पर अभी पक्का नहीं हुआ। वह अपने-आप चालू हो जाएगा, या खाता खोलकर पेमेंट ID भेजिए।", "পেমেন্ট পাওয়া গেছে কিন্তু এখনও নিশ্চিত হয়নি। নিজে থেকেই চালু হবে, নয়তো অ্যাকাউন্ট খুলে পেমেন্ট ID পাঠান।"), "account.html", L3("Open my account", "मेरा खाता खोलिए", "আমার অ্যাকাউন্ট খুলুন"));
+                });
+              }
+            });
+            rz.open();
+          }).catch(function () { busy(false); stat("err", L3("Payment window could not open. Check your internet and try again.", "पेमेंट की विंडो नहीं खुल सकी। इंटरनेट देखकर फिर कोशिश कीजिए।", "পেমেন্ট উইন্ডো খোলা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।")); });
         });
       }).catch(function () { busy(false); stat("err", L3("Could not reach the server. Check your internet and try again.", "सर्वर तक नहीं पहुँच सके। इंटरनेट देखकर फिर कोशिश कीजिए।", "সার্ভারে পৌঁছানো যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।")); });
   }
