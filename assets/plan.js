@@ -182,12 +182,18 @@
     $("#lsub").textContent = L3("Use the same Gmail you will use in the app. Your plan is tied to it.", "वही Gmail इस्तेमाल कीजिए जो ऐप में चलाएँगे। प्लान उसी से जुड़ेगा।", "যে Gmail অ্যাপে ব্যবহার করবেন সেটাই দিন। প্ল্যান ওটার সঙ্গে জুড়বে।");
     $("#gbtn").textContent = "G  " + L3("Continue with Google", "Google से आगे बढ़ें", "Google দিয়ে এগিয়ে যান");
   }
-  $("#gbtn").addEventListener("click", function () {
+  function startGoogle() {
     topErr("");
-    try { sessionStorage.setItem("payal_plan", plan); } catch (e) {}
-    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + "/account.html" } })
-      .then(function (r) { if (r.error) topErr(r.error.message); });
-  });
+    try { sessionStorage.setItem("payal_plan", plan); sessionStorage.setItem("payal_go_t", String(Date.now())); } catch (e) {}
+    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + "/account.html", queryParams: { prompt: "select_account" } } })
+      .then(function (r) { if (r.error) { show("login"); renderLogin(); topErr(r.error.message); } });
+  }
+  $("#gbtn").addEventListener("click", startGoogle);
+  /* tapping a plan on the home page goes straight to the Google account chooser */
+  function autoGo() {
+    try { var t = +sessionStorage.getItem("payal_go_t") || 0; if (Date.now() - t < 20000) return false; } catch (e) {}
+    return true;
+  }
 
   /* ---- payment ---- */
   function fn(path, body) {
@@ -247,7 +253,7 @@
   }
 
   function start(session) {
-    if (!session) { renderLogin(); show("login"); return; }
+    if (!session) { renderLogin(); if (autoGo()) { show("loading"); startGoogle(); } else show("login"); return; }
     sb.rpc("web_status").then(function (r) { current = r && r.data ? r.data : null; }).catch(function () {}).then(function () { return loadInfo(); }).then(renderPlan);
   }
   document.addEventListener("payal:lang", function () {

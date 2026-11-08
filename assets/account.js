@@ -14,11 +14,21 @@
   if (!window.supabase || !C.supabaseUrl) { show("login"); err(hl("Server not connected", "सर्वर से जुड़ नहीं सका", "সার্ভারের সঙ্গে সংযোগ হয়নি")); return; }
   var sb = window.supabase.createClient(C.supabaseUrl, C.supabaseAnonKey, { auth: { persistSession: true, detectSessionInUrl: true } });
   $("#gbtn").addEventListener("click", function () {
+    startGoogle();
+  });
+  function startGoogle() {
     err("");
     if (/[?&]dl=1/.test(location.search)) { try { sessionStorage.setItem("payal_dl", "1"); } catch (e) {} }
-    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } })
-      .then(function (r) { if (r.error) err(r.error.message); });
-  });
+    try { sessionStorage.setItem("payal_go_t", String(Date.now())); } catch (e) {}
+    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: "select_account" } } })
+      .then(function (r) { if (r.error) { show("login"); err(r.error.message); } });
+  }
+  /* download button asks for Gmail: go straight to the Google chooser, no extra page */
+  function autoGo() {
+    if (!/[?&]dl=1/.test(location.search)) return false;
+    try { var t = +sessionStorage.getItem("payal_go_t") || 0; if (Date.now() - t < 20000) return false; } catch (e) {}
+    return true;
+  }
   function maskMail(e) {
     var i = e.indexOf("@");
     if (i < 3) return e;
@@ -53,7 +63,7 @@
     } catch (e) {}
   }
   function load(session) {
-    if (!session) { show("login"); return; }
+    if (!session) { if (autoGo()) { show("loading"); startGoogle(); } else show("login"); return; }
     var pp = null; try { pp = sessionStorage.getItem("payal_plan"); } catch (e) {}
     if (pp === "plus" || pp === "pro") { try { sessionStorage.removeItem("payal_plan"); } catch (e) {} location.replace("plan.html?plan=" + pp); return; }
     sb.rpc("web_status").then(function (r) {
