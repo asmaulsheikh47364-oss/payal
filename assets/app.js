@@ -179,3 +179,36 @@
       }).catch(function () {});
   } catch (e) {}
 })();
+
+/* Festival sale strip: countdown "6d 03:35:59", the price after the offer with its date, and the close button. */
+(function () {
+  var C = window.PAYAL || {}, bar = document.getElementById("obar");
+  if (!bar) return;
+  var end = C.offerEnds ? Date.parse(C.offerEnds) : NaN;
+  try { if (sessionStorage.getItem("obar-closed") === String(end)) return; } catch (e) {}
+  if (isNaN(end) || end <= Date.now()) return;
+  function p(n) { return (n < 10 ? "0" : "") + n; }
+  var cd = document.getElementById("obar-cd"), af = document.getElementById("obar-after");
+  function after() {
+    var pro = null; (C.plans || []).forEach(function (x) { if (x.id === "pro") pro = x; });
+    var mrp = pro && pro.mrp > pro.price ? pro.mrp : 0;
+    if (!af || !mrp) return;
+    var l = window.PAYAL_LANG || "en", loc = (l === "hi" ? "hi-IN" : l === "bn" ? "bn-IN" : "en-IN") + "-u-nu-latn";
+    var d = new Date(end + 60000).toLocaleDateString(loc, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
+    af.textContent = (window.PT ? PT("From {d}") : "From {d}").replace("{d}", d) + " \u20b9" + mrp;
+  }
+  function tick() {
+    var t = end - Date.now();
+    if (t <= 0) { bar.hidden = true; return false; }
+    var s = Math.floor(t / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+    cd.textContent = (d > 0 ? d + "d " : "") + p(h) + ":" + p(m) + ":" + p(x);
+    return true;
+  }
+  after(); document.addEventListener("payal:lang", after);
+  bar.hidden = false;
+  if (tick()) { var iv = setInterval(function () { if (!tick()) clearInterval(iv); }, 1000); }
+  bar.querySelector(".obar-x").addEventListener("click", function () {
+    bar.hidden = true;
+    try { sessionStorage.setItem("obar-closed", String(end)); } catch (e) {}
+  });
+})();
