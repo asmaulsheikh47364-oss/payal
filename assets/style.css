@@ -400,7 +400,7 @@ footer{padding:26px 0 30px;border:0;background:transparent}
 .plan.dw .pat{position:absolute;right:-30px;top:-30px;width:230px;height:230px;background:url(rangoli.svg) center/contain no-repeat;opacity:.28;pointer-events:none}
 .plan.dw>*{position:relative}.plan.dw>.pat{position:absolute}
 .plan.dw .offer{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:#ffb066}
-.plan.dw .offer::before{content:"";width:9px;height:9px;border-radius:50%;background:#ff8a2a;box-shadow:0 0 12px #ff8a2a}
+.plan.dw .offer::before{content:"";width:30px;height:19px;flex:0 0 auto;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'><circle cx='16' cy='12' r='7' fill='%23ffb347'/><circle cx='16' cy='12' r='4.2' fill='%23ffe08a'/><path d='M3 15h26M6 18.5h20' stroke='%23ff8a2a' stroke-width='1.8' stroke-linecap='round' fill='none'/></svg>") center/contain no-repeat;filter:drop-shadow(0 0 6px rgba(255,138,42,.6))}
 .plan.dw h3{font-family:'Poppins',sans-serif;font-size:30px;line-height:1.18;color:#fff;margin:0 0 6px;padding-right:46px}
 .plan.dw .price{display:flex;align-items:baseline;gap:12px;margin:6px 0 14px}
 .plan.dw .now{font-family:'Poppins',sans-serif;font-weight:800;font-size:52px;line-height:1;color:#ffb066;text-shadow:0 0 22px rgba(255,138,42,.4)}
@@ -526,3 +526,5 @@ body{border-top:3px solid transparent;border-image:linear-gradient(90deg,#e23b2e
 .obar-cd svg{width:18px;height:18px;color:#ffa046}
 @media (min-width:760px){.obar-in{flex-direction:row;align-items:center}.obar-r1{flex:1}.obar-r2{order:-1;flex:0 0 auto;display:none}.obar-in .obar-r2{display:flex;order:0}}
 @media (min-width:760px){.obar-in{position:relative;padding-right:58px}.obar-x{position:absolute;right:12px;top:50%;transform:translateY(-50%)}}
+
+.i.sun{width:1.6em;height:1em;flex:0 0 auto}
