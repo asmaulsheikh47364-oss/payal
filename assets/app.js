@@ -249,3 +249,22 @@
 
 /* When the phone shows a page again from its Back-button memory, reload it so login and plan state are fresh. */
 window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
+
+/* Shine timing: one band per line, same speed (about 55 px a second) and the same thin width on every line. */
+(function () {
+  var SEL = ".shtxt,.festive,.plan.dw .offer,.plan .now,.price .now,.obar-t,.obar-p,.launchline,.plan.dw .t-offer";
+  function tune() {
+    var list = document.querySelectorAll(SEL);
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i], w = e.getBoundingClientRect().width;
+      if (!w) continue;
+      e.style.setProperty("--bw", Math.min(12, (7 / (2 * w)) * 100).toFixed(2) + "%");
+      e.style.animationDuration = Math.max(1.6, w / 55).toFixed(2) + "s";
+    }
+  }
+  tune();
+  [400, 1200, 3000].forEach(function (t) { setTimeout(tune, t); });
+  window.addEventListener("resize", tune);
+  window.addEventListener("load", tune);
+  document.addEventListener("payal:lang", function () { setTimeout(tune, 50); });
+})();
