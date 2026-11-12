@@ -47,10 +47,34 @@
       var g = el("div", { class: "grid" });
       items.forEach(function (i) { g.appendChild(el("div", { class: "card stat" }, [el("b", { text: String(i[1]) }), el("span", { text: i[0] })])); });
       v.appendChild(g);
+      funnel(v);
       v.appendChild(el("div", { class: "row grow" }, [
         el("button", { text: "👥 Users dekho", class: "pri", onclick: function () { tab = "users"; drawTabs(); draw(); } }),
         el("button", { text: "🎁 Gift do", class: "vio", onclick: function () { tab = "gift"; drawTabs(); draw(); } })
       ]));
+    });
+  }
+  /* where people stop: website login -> download -> app connected -> paid */
+  function funnel(v) {
+    var box = el("div", { class: "card" }, [el("b", { text: "Log kahan ruk rahe hain" })]);
+    v.appendChild(box);
+    var g = el("div", { class: "grid" }); box.appendChild(g);
+    function add(n, t) { g.appendChild(el("div", { class: "card stat" }, [el("b", { text: String(n) }), el("span", { text: t })])); }
+    call("admin_funnel").then(function (f) {
+      if (!f) { box.appendChild(el("p", { class: "mut", text: "Download ginti abhi chalu nahi hui (database mein ek baar SQL chalana baaki hai)." })); }
+      else {
+        add(f.join_today + " / " + f.join_week + " / " + f.join_total, "Gmail login: aaj / 7 din / kul");
+        add(f.seen_today, "Aaj aaye (login kiya)");
+        add(f.dl_today + " / " + f.dl_week + " / " + f.dl_total, "Download dabaya: aaj / 7 din / kul");
+      }
+      call("admin_users", { p_q: "", p_limit: 5000 }).then(function (rows) {
+        if (!rows) return;
+        var app = 0, active = 0, paid = 0;
+        rows.forEach(function (u) { if (u.device_id) app++; if (u.used_today > 0) active++; if (u.tier && u.tier !== "free") paid++; });
+        add(app, "App mein jude (phone juda)");
+        add(active, "Aaj app chalaya (free)");
+        add(paid, "Plan wale (Plus/Pro)");
+      });
     });
   }
   function users(v) {

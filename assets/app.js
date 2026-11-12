@@ -45,9 +45,13 @@
       if (!googleGo()) location.href = "account.html";
     });
   })();
+  function countDl() {
+    try { if (C.supabaseUrl) fetch(C.supabaseUrl + "/rest/v1/rpc/log_download", { method: "POST", keepalive: true, headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: JSON.stringify({ p_logged: loggedIn() }) }).catch(function () {}); } catch (e) {}
+  }
   $$("[data-apk]").forEach(function (a) {
     a.href = C.apkUrl || "#";
     a.addEventListener("click", function (e) {
+      countDl();
       if (loggedIn()) return;
       e.preventDefault();
       try { sessionStorage.setItem("payal_dl", "1"); } catch (x) {}
