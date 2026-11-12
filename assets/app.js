@@ -31,6 +31,7 @@
   /* ask for Gmail right here (Google account chooser), no extra page in between */
   function googleGo() {
     if (!C.supabaseUrl) return false;
+    if (!/[?&]dl=1/.test(location.search)) { try { sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {} }
     location.href = C.supabaseUrl + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(location.origin + "/account.html");
     return true;
   }

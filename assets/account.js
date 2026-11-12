@@ -18,6 +18,7 @@
   });
   function startGoogle() {
     err("");
+    try { sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {}
     if (/[?&]dl=1/.test(location.search)) { try { sessionStorage.setItem("payal_dl", "1"); } catch (e) {} }
     try { sessionStorage.setItem("payal_go_t", String(Date.now())); } catch (e) {}
     return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } })
@@ -62,8 +63,21 @@
       if (sessionStorage.getItem("payal_dl") === "1") { sessionStorage.removeItem("payal_dl"); var g = $("#gift"); if (g) g.scrollIntoView({ behavior: "smooth", block: "center" }); }
     } catch (e) {}
   }
+  /* after Google login, step Back over the Google pages so the Back button never lands on Google again */
+  function backOverGoogle() {
+    try {
+      var hl = +sessionStorage.getItem("payal_hl") || 0; if (!hl) return false;
+      sessionStorage.removeItem("payal_hl");
+      var n = history.length - hl;
+      if (n > 0 && n < 15) { history.go(-n); return true; }
+    } catch (e) {}
+    return false;
+  }
   function load(session) {
     if (!session) { if (autoGo()) { show("loading"); startGoogle(); } else show("login"); return; }
+    var dlFlow = false; try { dlFlow = sessionStorage.getItem("payal_dl") === "1"; } catch (e) {}
+    if (dlFlow) { try { sessionStorage.removeItem("payal_hl"); } catch (e) {} }
+    if (!dlFlow && backOverGoogle()) { try { sessionStorage.removeItem("payal_back"); sessionStorage.removeItem("payal_plan"); } catch (e) {} return; }
     var back = null; try { back = sessionStorage.getItem("payal_back"); sessionStorage.removeItem("payal_back"); } catch (e) {}
     if (back && /^\/(?!\/)/.test(back) && !/account\.html/.test(back)) { location.replace(back); return; }
     var pp = null; try { pp = sessionStorage.getItem("payal_plan"); } catch (e) {}

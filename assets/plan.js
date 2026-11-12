@@ -184,7 +184,7 @@
   }
   function startGoogle() {
     topErr("");
-    try { sessionStorage.setItem("payal_plan", plan); sessionStorage.setItem("payal_go_t", String(Date.now())); } catch (e) {}
+    try { sessionStorage.setItem("payal_plan", plan); sessionStorage.setItem("payal_go_t", String(Date.now())); sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {}
     return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + "/account.html" } })
       .then(function (r) { if (r.error) { show("login"); renderLogin(); topErr(r.error.message); } });
   }

@@ -398,16 +398,25 @@
       });
     });
   }
+  window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
+  /* after Google login, step Back over the Google pages so the Back button never lands on Google again */
+  function backOverGoogle() {
+    try {
+      var hl = +sessionStorage.getItem("payal_hl") || 0; if (!hl) return false;
+      sessionStorage.removeItem("payal_hl");
+      var n = history.length - hl;
+      if (n > 0 && n < 15) { history.go(-n); return true; }
+    } catch (e) {}
+    return false;
+  }
   $("#gbtn").addEventListener("click", function () {
-    try { sessionStorage.setItem("payalAdminGo", "1"); } catch (e) {}
-    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: "select_account" } } }).then(function (r) { if (r.error) $("#err").textContent = r.error.message; });
+    try { sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {}
+    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } }).then(function (r) { if (r.error) $("#err").textContent = r.error.message; });
   });
   $("#out").addEventListener("click", function () { sb.auth.signOut({ scope: "local" }).then(function () { location.reload(); }); });
   function start(session) {
-    var go = false;
-    try { go = sessionStorage.getItem("payalAdminGo") === "1"; sessionStorage.removeItem("payalAdminGo"); } catch (e) {}
-    if (session && !go) { sb.auth.signOut({ scope: "local" }).then(function () { show("login"); }); return; }
     if (!session) { show("login"); return; }
+    if (backOverGoogle()) return;
     
     $("#out").hidden = false;
     sb.rpc("is_admin").then(function (r) { if (r.data === true) { show("app"); drawTabs(); draw(); } else show("denied"); });
