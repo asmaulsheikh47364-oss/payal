@@ -2,6 +2,7 @@
 window.PAYAL = {
   apkUrl: "https://payalapp.in/download/payal.apk",
   apkVersion: "v58",
+  apkBuild: 122,
   apkSize: "26 MB",
   apkSha256: "faced9cca636ff37212003e3e32258f73644b1549d76afb8342caf9304dc18d7",
   whatsapp: "",
