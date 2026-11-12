@@ -185,8 +185,8 @@
   function startGoogle() {
     topErr("");
     try { sessionStorage.setItem("payal_plan", plan); sessionStorage.setItem("payal_go_t", String(Date.now())); sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {}
-    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + "/account.html" } })
-      .then(function (r) { if (r.error) { show("login"); renderLogin(); topErr(r.error.message); } });
+    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + "/account.html", skipBrowserRedirect: true } })
+      .then(function (r) { if (r.error) { show("login"); renderLogin(); topErr(r.error.message); return; } if (r.data && r.data.url) { if (window.payalOpenLogin) window.payalOpenLogin(r.data.url); else location.href = r.data.url; } });
   }
   $("#gbtn").addEventListener("click", startGoogle);
   /* tapping a plan on the home page goes straight to the Google account chooser */

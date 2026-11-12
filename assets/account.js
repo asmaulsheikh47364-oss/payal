@@ -21,8 +21,8 @@
     try { sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {}
     if (/[?&]dl=1/.test(location.search)) { try { sessionStorage.setItem("payal_dl", "1"); } catch (e) {} }
     try { sessionStorage.setItem("payal_go_t", String(Date.now())); } catch (e) {}
-    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } })
-      .then(function (r) { if (r.error) { show("login"); err(r.error.message); } });
+    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname, skipBrowserRedirect: true } })
+      .then(function (r) { if (r.error) { show("login"); err(r.error.message); return; } if (r.data && r.data.url) { if (window.payalOpenLogin) window.payalOpenLogin(r.data.url); else location.href = r.data.url; } });
   }
   /* download button asks for Gmail: go straight to the Google chooser, no extra page */
   function autoGo() {
@@ -75,6 +75,7 @@
   }
   function load(session) {
     if (!session) { if (autoGo()) { show("loading"); startGoogle(); } else show("login"); return; }
+    if (window.payalLoginTabDone && window.payalLoginTabDone()) return;
     var dlFlow = false; try { dlFlow = sessionStorage.getItem("payal_dl") === "1"; } catch (e) {}
     if (dlFlow) { try { sessionStorage.removeItem("payal_hl"); } catch (e) {} }
     if (!dlFlow && backOverGoogle()) { try { sessionStorage.removeItem("payal_back"); } catch (e) {} return; }

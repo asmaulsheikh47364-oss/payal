@@ -32,7 +32,8 @@
   function googleGo() {
     if (!C.supabaseUrl) return false;
     if (!/[?&]dl=1/.test(location.search)) { try { sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {} }
-    location.href = C.supabaseUrl + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(location.origin + "/account.html");
+    var u = C.supabaseUrl + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(location.origin + "/account.html");
+    if (window.payalOpenLogin) window.payalOpenLogin(u); else location.href = u;
     return true;
   }
   /* menu "Log in": straight to the Google chooser, then back to this same page (not the account page) */

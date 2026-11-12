@@ -411,11 +411,12 @@
   }
   $("#gbtn").addEventListener("click", function () {
     try { sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {}
-    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } }).then(function (r) { if (r.error) $("#err").textContent = r.error.message; });
+    sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname, skipBrowserRedirect: true } }).then(function (r) { if (r.error) { $("#err").textContent = r.error.message; return; } if (r.data && r.data.url) { if (window.payalOpenLogin) window.payalOpenLogin(r.data.url); else location.href = r.data.url; } });
   });
   $("#out").addEventListener("click", function () { sb.auth.signOut({ scope: "local" }).then(function () { location.reload(); }); });
   function start(session) {
     if (!session) { show("login"); return; }
+    if (window.payalLoginTabDone && window.payalLoginTabDone()) return;
     if (backOverGoogle()) return;
     
     $("#out").hidden = false;
