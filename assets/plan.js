@@ -254,6 +254,7 @@
 
   function start(session) {
     if (!session) { renderLogin(); if (autoGo()) { show("loading"); startGoogle(); } else show("login"); return; }
+    try { sessionStorage.removeItem("payal_plan"); } catch (e) {}
     sb.rpc("web_status").then(function (r) { current = r && r.data ? r.data : null; }).catch(function () {}).then(function () { return loadInfo(); }).then(renderPlan);
   }
   document.addEventListener("payal:lang", function () {

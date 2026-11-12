@@ -177,22 +177,39 @@
   }catch(e){}
 })();
 
-/* Admin button: shown on every page only when the signed-in Gmail is an admin (checked by the server). */
+/* Admin button: shown on every page only when the signed-in Gmail is an admin (checked by the server).
+   An old login is refreshed first, the same way the login library does, so the button does not vanish after an hour. */
 (function () {
   try {
     var C = window.PAYAL || {}; if (!C.supabaseUrl) return;
     var ref = C.supabaseUrl.replace(/^https?:\/\//, "").split(".")[0];
-    var raw = localStorage.getItem("sb-" + ref + "-auth-token"); if (!raw) return;
-    var j = JSON.parse(raw); var tok = (j && j.access_token) || (j && j.currentSession && j.currentSession.access_token); if (!tok) return;
-    fetch(C.supabaseUrl + "/rest/v1/rpc/is_admin", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Authorization": "Bearer " + tok, "Content-Type": "application/json" }, body: "{}" })
-      .then(function (r) { return r.ok ? r.json() : false; })
-      .then(function (ok) {
-        if (ok !== true) return;
-        var sw = document.getElementById("swap"); if (sw) sw.hidden = false;
-        var al = document.getElementById("adminlink"); if (al) al.hidden = false;
-        var d = document.getElementById("m-dash");
-        if (d && !document.getElementById("m-admin")) { var a = document.createElement("a"); a.className = "l"; a.id = "m-admin"; a.href = "admin.html"; a.textContent = "Admin"; d.parentNode.insertBefore(a, d.nextSibling); }
-      }).catch(function () {});
+    var key = "sb-" + ref + "-auth-token";
+    var raw = localStorage.getItem(key); if (!raw) return;
+    var j = JSON.parse(raw); if (!j || !j.access_token) return;
+    function fresh() {
+      if (j.expires_at && j.expires_at * 1000 > Date.now() + 60000) return Promise.resolve(j.access_token);
+      if (!j.refresh_token) return Promise.resolve(null);
+      return fetch(C.supabaseUrl + "/auth/v1/token?grant_type=refresh_token", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: JSON.stringify({ refresh_token: j.refresh_token }) })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (n) {
+          if (!n || !n.access_token) return null;
+          if (!n.expires_at && n.expires_in) n.expires_at = Math.floor(Date.now() / 1000) + n.expires_in;
+          try { localStorage.setItem(key, JSON.stringify(n)); } catch (e) {}
+          return n.access_token;
+        }).catch(function () { return null; });
+    }
+    fresh().then(function (tok) {
+      if (!tok) return;
+      return fetch(C.supabaseUrl + "/rest/v1/rpc/is_admin", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Authorization": "Bearer " + tok, "Content-Type": "application/json" }, body: "{}" })
+        .then(function (r) { return r.ok ? r.json() : false; })
+        .then(function (ok) {
+          if (ok !== true) return;
+          var sw = document.getElementById("swap"); if (sw) sw.hidden = false;
+          var al = document.getElementById("adminlink"); if (al) al.hidden = false;
+          var d = document.getElementById("m-dash");
+          if (d && !document.getElementById("m-admin")) { var a = document.createElement("a"); a.className = "l"; a.id = "m-admin"; a.href = "admin.html"; a.textContent = "Admin"; d.parentNode.insertBefore(a, d.nextSibling); }
+        });
+    }).catch(function () {});
   } catch (e) {}
 })();
 

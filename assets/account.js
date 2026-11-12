@@ -77,7 +77,7 @@
     if (!session) { if (autoGo()) { show("loading"); startGoogle(); } else show("login"); return; }
     var dlFlow = false; try { dlFlow = sessionStorage.getItem("payal_dl") === "1"; } catch (e) {}
     if (dlFlow) { try { sessionStorage.removeItem("payal_hl"); } catch (e) {} }
-    if (!dlFlow && backOverGoogle()) { try { sessionStorage.removeItem("payal_back"); sessionStorage.removeItem("payal_plan"); } catch (e) {} return; }
+    if (!dlFlow && backOverGoogle()) { try { sessionStorage.removeItem("payal_back"); } catch (e) {} return; }
     var back = null; try { back = sessionStorage.getItem("payal_back"); sessionStorage.removeItem("payal_back"); } catch (e) {}
     if (back && /^\/(?!\/)/.test(back) && !/account\.html/.test(back)) { location.replace(back); return; }
     var pp = null; try { pp = sessionStorage.getItem("payal_plan"); } catch (e) {}
