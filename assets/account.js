@@ -20,7 +20,7 @@
     err("");
     if (/[?&]dl=1/.test(location.search)) { try { sessionStorage.setItem("payal_dl", "1"); } catch (e) {} }
     try { sessionStorage.setItem("payal_go_t", String(Date.now())); } catch (e) {}
-    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: "select_account" } } })
+    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } })
       .then(function (r) { if (r.error) { show("login"); err(r.error.message); } });
   }
   /* download button asks for Gmail: go straight to the Google chooser, no extra page */
@@ -64,12 +64,18 @@
   }
   function load(session) {
     if (!session) { if (autoGo()) { show("loading"); startGoogle(); } else show("login"); return; }
+    var back = null; try { back = sessionStorage.getItem("payal_back"); sessionStorage.removeItem("payal_back"); } catch (e) {}
+    if (back && /^\/(?!\/)/.test(back) && !/account\.html/.test(back)) { location.replace(back); return; }
     var pp = null; try { pp = sessionStorage.getItem("payal_plan"); } catch (e) {}
     if (pp === "plus" || pp === "pro") { try { sessionStorage.removeItem("payal_plan"); } catch (e) {} location.replace("plan.html?plan=" + pp); return; }
-    sb.rpc("web_status").then(function (r) {
-      if (r.error) { err(r.error.message); show("login"); return; }
-      render(r.data || {}, session.user);
-    });
+    function ask(retry) {
+      sb.rpc("web_status").then(function (r) {
+        if (!r.error) { render(r.data || {}, session.user); return; }
+        if (retry) { sb.auth.refreshSession().then(function (x) { if (x && x.data && x.data.session) { session = x.data.session; ask(false); } else { show("login"); } }); return; }
+        render({}, session.user); err(r.error.message);
+      });
+    }
+    ask(true);
   }
   function setup() {
     var kind = $("#hkind");

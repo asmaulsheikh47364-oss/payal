@@ -31,9 +31,20 @@
   /* ask for Gmail right here (Google account chooser), no extra page in between */
   function googleGo() {
     if (!C.supabaseUrl) return false;
-    location.href = C.supabaseUrl + "/auth/v1/authorize?provider=google&prompt=select_account&redirect_to=" + encodeURIComponent(location.origin + "/account.html");
+    location.href = C.supabaseUrl + "/auth/v1/authorize?provider=google&redirect_to=" + encodeURIComponent(location.origin + "/account.html");
     return true;
   }
+  /* menu "Log in": straight to the Google chooser, then back to this same page (not the account page) */
+  (function () {
+    var d = document.getElementById("m-dash");
+    if (!d || /account\.html$/.test(location.pathname)) return;
+    d.addEventListener("click", function (e) {
+      if (loggedIn()) return;
+      e.preventDefault();
+      try { sessionStorage.setItem("payal_back", location.pathname + location.search + location.hash); } catch (x) {}
+      if (!googleGo()) location.href = "account.html";
+    });
+  })();
   $$("[data-apk]").forEach(function (a) {
     a.href = C.apkUrl || "#";
     a.addEventListener("click", function (e) {
@@ -212,3 +223,6 @@
     try { sessionStorage.setItem("obar-closed", String(end)); } catch (e) {}
   });
 })();
+
+/* When the phone shows a page again from its Back-button memory, reload it so login and plan state are fresh. */
+window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
