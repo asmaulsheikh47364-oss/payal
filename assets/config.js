@@ -9,8 +9,8 @@ window.PAYAL = {
   email: "asmaulsheikh47364@gmail.com",
   paymentsLive: false,
   /* Offer countdown: change this date to end the offer sooner or later. Empty string hides every countdown. */
-  offerName: "Shubh Deepawali",
-  offerEnds: "2026-11-10T23:59:59+05:30",
+  offerName: "Chhath Puja ki Shubhkamnayein",
+  offerEnds: "2026-11-16T23:59:59+05:30",
   supabaseUrl: "https://hwfifqyssabwwdjlbqty.supabase.co",
   supabaseAnonKey: "sb_publishable_p_qIHrnCIUqRK7l-rkDhRw_r-O0yIWW",
   plans: [

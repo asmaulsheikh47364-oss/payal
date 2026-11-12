@@ -61,7 +61,7 @@
     var l = window.PAYAL_LANG;
     var n = l === "hi" ? info.offerHi : info.offerEn;
     n = n || info.offerEn || info.offerHi;
-    return n || (window.PT ? window.PT(C.offerName || "Shubh Deepawali") : (C.offerName || ""));
+    return n || (window.PT ? window.PT(C.offerName || "Chhath Puja ki Shubhkamnayein") : (C.offerName || ""));
   }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
   function svgUse(id) {
@@ -86,7 +86,7 @@
     card.appendChild(price);
     var nd = nextDay();
     if (on && info.mrp > info.price) {
-      card.appendChild(el("div", "save", L3("After Diwali", "दिवाली के बाद", "দীপাবলির পরে") + " ₹" + info.mrp + (nd ? " · " + L3("from " + nd, nd + " से", nd + " থেকে") : "")));
+      card.appendChild(el("div", "save", L3("After the offer", "ऑफ़र के बाद", "অফারের পরে") + " ₹" + info.mrp + (nd ? " · " + L3("from " + nd, nd + " से", nd + " থেকে") : "")));
     }
     if (on) {
       var cd = el("div", "plan-cd"); cd.appendChild(el("small", "", L3("Offer ends in", "ऑफ़र ख़त्म होने में", "অফার শেষ হতে")));

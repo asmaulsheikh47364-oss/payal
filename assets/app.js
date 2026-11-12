@@ -69,7 +69,7 @@
     (list || []).forEach(function (p) {
       var rupee = "\u20b9" + p.price;
       $$('[data-p="' + p.id + '"]').forEach(function (e) { e.textContent = rupee; });
-      var after = p.mrp > p.price && p.price > 0 ? PT("After Diwali") + " \u20b9" + p.mrp + (nd ? " \u00b7 " + PT("from {d}").replace("{d}", nd) : "") : "";
+      var after = p.mrp > p.price && p.price > 0 ? PT("After the offer") + " \u20b9" + p.mrp + (nd ? " \u00b7 " + PT("from {d}").replace("{d}", nd) : "") : "";
       $$('[data-after="' + p.id + '"]').forEach(function (e) { e.textContent = after; e.style.display = after ? "" : "none"; });
       var el = $("#plan-" + p.id); if (!el) return;
       var now = $(".now", el), mrp = $(".mrp", el), save = $(".save", el), off = $(".offer", el);
@@ -77,7 +77,7 @@
       if (mrp) mrp.style.display = "none";
       if (after) {
         if (save) { save.style.display = "inline-block"; save.textContent = after; }
-        if (off && !off.classList.contains("static")) { off.textContent = PT(C.offerName || "Shubh Deepawali"); off.style.display = ""; }
+        if (off && !off.classList.contains("static")) { off.textContent = PT(C.offerName || "Chhath Puja ki Shubhkamnayein"); off.style.display = ""; }
       } else {
         if (save) save.style.display = "none";
         if (off && !off.classList.contains("static")) { off.textContent = ""; off.style.display = "none"; }
@@ -159,4 +159,23 @@
     box.appendChild(btn);box.appendChild(list);
     var out=document.getElementById('m-out'); out?nav.insertBefore(box,out):nav.appendChild(box);
   }catch(e){}
+})();
+
+/* Admin button: shown on every page only when the signed-in Gmail is an admin (checked by the server). */
+(function () {
+  try {
+    var C = window.PAYAL || {}; if (!C.supabaseUrl) return;
+    var ref = C.supabaseUrl.replace(/^https?:\/\//, "").split(".")[0];
+    var raw = localStorage.getItem("sb-" + ref + "-auth-token"); if (!raw) return;
+    var j = JSON.parse(raw); var tok = (j && j.access_token) || (j && j.currentSession && j.currentSession.access_token); if (!tok) return;
+    fetch(C.supabaseUrl + "/rest/v1/rpc/is_admin", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Authorization": "Bearer " + tok, "Content-Type": "application/json" }, body: "{}" })
+      .then(function (r) { return r.ok ? r.json() : false; })
+      .then(function (ok) {
+        if (ok !== true) return;
+        var sw = document.getElementById("swap"); if (sw) sw.hidden = false;
+        var al = document.getElementById("adminlink"); if (al) al.hidden = false;
+        var d = document.getElementById("m-dash");
+        if (d && !document.getElementById("m-admin")) { var a = document.createElement("a"); a.className = "l"; a.id = "m-admin"; a.href = "admin.html"; a.textContent = "Admin"; d.parentNode.insertBefore(a, d.nextSibling); }
+      }).catch(function () {});
+  } catch (e) {}
 })();
