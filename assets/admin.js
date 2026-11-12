@@ -24,6 +24,42 @@
       return r.data;
     });
   }
+  /* PLAN GUARD: a paid plan can be given only when the person has none running; never stacked or queued.
+     Success puts a green tick on the button; a repeat tap shows the reason for a few seconds. */
+  var givenNow = {};
+  function planOf(userId, email) {
+    if (givenNow[userId] && givenNow[userId].until > Date.now()) return Promise.resolve(givenNow[userId]);
+    return sb.rpc("admin_users", { p_q: email || "", p_limit: 50 }).then(function (r) {
+      var row = null; (r.data || []).forEach(function (x) { if (x.id === userId) row = x; });
+      if (row && row.tier && row.tier !== "free" && row.expires_at && Date.parse(row.expires_at) > Date.now()) return { plan: row.tier, until: Date.parse(row.expires_at) };
+      return null;
+    }).catch(function () { return null; });
+  }
+  function flash(btn, text, ok) {
+    var host = btn.parentNode; if (!host) return;
+    var old = host.querySelector(".gmsg"); if (old) old.remove();
+    var m = el("div", { class: "gmsg " + (ok ? "ok" : "bad"), text: text });
+    host.parentNode.insertBefore(m, host.nextSibling);
+    setTimeout(function () { if (m.parentNode) m.remove(); }, ok ? 4000 : 7000);
+  }
+  function guardedGive(btn, userId, email, planName, doGive) {
+    if (btn.dataset.busy === "1") return;
+    btn.dataset.busy = "1"; btn.disabled = true;
+    planOf(userId, email).then(function (cur) {
+      if (cur) {
+        btn.dataset.busy = ""; btn.disabled = false;
+        flash(btn, "Nahi diya: is user ka " + (PN[cur.plan] || cur.plan) + " plan " + d0(new Date(cur.until).toISOString()) + " tak pehle se chalu hai. Wo khatam hone ke baad hi naya plan de sakte hain.", false);
+        return;
+      }
+      doGive().then(function (res) {
+        btn.dataset.busy = ""; btn.disabled = false;
+        if (!res) { flash(btn, "Plan nahi diya ja saka (upar ka sandesh dekhiye).", false); return; }
+        givenNow[userId] = { plan: res.plan, until: Date.now() + res.days * 86400000 };
+        if (!btn.querySelector(".gtick")) btn.appendChild(el("span", { class: "gtick", text: " \u2714" }));
+        flash(btn, planName + " " + res.days + " din ke liye de diya.", true);
+      });
+    });
+  }
   function waLink(phone, text) {
     var p = String(phone || "").replace(/[^0-9]/g, "");
     if (p.length === 10) p = "91" + p;
@@ -101,7 +137,7 @@
     var more = el("div", { class: "more", hidden: "" });
     var days = el("input", { type: "number", value: "30", min: "1", max: "3650" });
     var act = function (fn, args, msg) { return function () { if (msg && !confirm(msg)) return; call(fn, args).then(function (r) { if (r) { toast("Ho gaya"); reload(); } }); }; };
-    var give = function (plan) { return function () { var n = parseInt(days.value, 10) || 30; call("admin_grant", { p_user: u.id, p_plan: plan, p_days: n, p_note: "admin" }).then(function (r) { if (r) { toast(PN[plan] + " " + n + " din de diya"); reload(); } }); }; };
+    var give = function (plan) { return function (ev) { var b = ev.currentTarget; var n = parseInt(days.value, 10) || 30; guardedGive(b, u.id, u.email, PN[plan], function () { return call("admin_grant", { p_user: u.id, p_plan: plan, p_days: n, p_note: "admin" }).then(function (r) { if (r) { setTimeout(reload, 2500); return { plan: plan, days: n }; } return null; }); }); }; };
     more.appendChild(el("label", { text: "Kitne din ke liye plan dena hai" }));
     more.appendChild(days);
     more.appendChild(el("div", { class: "row grow", style: "margin-top:8px" }, [el("button", { text: "Plus do", class: "pri", onclick: give("plus") }), el("button", { text: "Pro do", class: "gold", onclick: give("pro") })]));
@@ -212,8 +248,9 @@
           if (m.status === "open") {
             var row = el("div", { class: "row grow", style: "margin-top:10px" });
             if (m.user_id) {
-              row.appendChild(el("button", { text: "Plus do (30 din)", class: "pri", onclick: function () { if (confirm("Plus 30 din de dein aur ye message band karein?")) call("admin_support_grant", { p_id: m.id, p_plan: "plus" }).then(function (r) { if (r) { toast("Plus de diya"); load(); } }); } }));
-              row.appendChild(el("button", { text: "Pro do (30 din)", class: "gold", onclick: function () { if (confirm("Pro 30 din de dein aur ye message band karein?")) call("admin_support_grant", { p_id: m.id, p_plan: "pro" }).then(function (r) { if (r) { toast("Pro de diya"); load(); } }); } }));
+              var sg = function (plan) { return function (ev) { var b = ev.currentTarget; if (b.dataset.busy === "1") return; if (!confirm(PN[plan] + " 30 din de dein aur ye message band karein?")) return; guardedGive(b, m.user_id, m.email, PN[plan], function () { return call("admin_support_grant", { p_id: m.id, p_plan: plan }).then(function (r) { if (r) { setTimeout(load, 2500); return { plan: plan, days: 30 }; } return null; }); }); }; };
+              row.appendChild(el("button", { text: "Plus do (30 din)", class: "pri", onclick: sg("plus") }));
+              row.appendChild(el("button", { text: "Pro do (30 din)", class: "gold", onclick: sg("pro") }));
             }
             row.appendChild(el("button", { text: "Jawab ke saath band karo", onclick: function () { var n = prompt("Unko kya jawab dikhana hai?", "Aapka masla dekh liya gaya hai."); if (n === null) return; call("admin_support_close", { p_id: m.id, p_note: n }).then(function (r) { if (r) { toast("Band ho gaya"); load(); } }); } }));
             kids.push(row);

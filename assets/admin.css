@@ -49,3 +49,9 @@ header a.swapb{border:1px solid var(--line);background:rgba(255,255,255,.09);pad
 header #out{min-height:34px;padding:6px 10px;font-size:13px}header{gap:8px}header #who{min-width:0}
 header #who{white-space:normal;line-height:1.15;overflow:visible}
 header a.bd{display:flex;align-items:center;gap:10px}header a.bd span{flex:0 0 auto;font-family:Poppins,system-ui,sans-serif;font-size:20px}
+
+.gtick{color:#22c55e;font-weight:900;text-shadow:0 0 6px rgba(34,197,94,.6)}
+.gmsg{margin-top:8px;padding:9px 12px;border-radius:10px;font-size:14px;line-height:1.4}
+.gmsg.ok{background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.5);color:#bbf7d0}
+.gmsg.bad{background:rgba(251,113,133,.14);border:1px solid rgba(251,113,133,.55);color:#fecdd3}
+button:disabled{opacity:.6}
