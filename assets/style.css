@@ -529,23 +529,16 @@ body{border-top:3px solid transparent;border-image:linear-gradient(90deg,#e23b2e
 
 .i.sun{width:1.6em;height:1em;flex:0 0 auto}
 
-/* moving shine: a soft light streak passes over offer words, download buttons and premium prices; their own colours stay */
-@keyframes payalShine{0%{transform:translateX(-120%) skewX(-20deg)}55%,100%{transform:translateX(320%) skewX(-20deg)}}
-@keyframes payalTextShine{0%{background-position:120% 0}55%,100%{background-position:-20% 0}}
-/* boxes and buttons: a light band slides across */
-.pill,.obar-btn,[data-apk],.bigbtn{position:relative;overflow:hidden}
-.pill::after,.obar-btn::after,[data-apk]::after,.bigbtn::after{
-  content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:38%;pointer-events:none;
-  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.38),rgba(255,255,255,0));
-  animation:payalShine 3.2s ease-in-out infinite}
-[data-apk]::after,.obar-btn::after,.bigbtn::after{animation-delay:1.4s}
-/* words and prices: the light runs through the letters themselves, colour unchanged */
-.festive,.plan.dw .offer,.plan .now,.price .now,.obar-p,.launchline{
+/* moving shine: a thin soft light runs through the letters only (never the whole button or box); colours stay */
+@keyframes payalTextShine{0%{background-position:130% 0}60%,100%{background-position:-30% 0}}
+.shtxt,.festive,.plan.dw .offer,.plan .now,.price .now,.obar-p,.launchline{
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  background-size:260% 100%;animation:payalTextShine 3.6s ease-in-out infinite}
-.festive,.plan.dw .offer{background-image:linear-gradient(105deg,#ffb066 42%,#fff4e0 50%,#ffb066 58%)}
-.plan .now,.price .now{background-image:linear-gradient(105deg,#ffb066 42%,#fff4e0 50%,#ffb066 58%);animation-delay:.8s}
-.obar-p{background-image:linear-gradient(105deg,#ffa046 42%,#fff1dc 50%,#ffa046 58%);animation-delay:.4s}
-.launchline{background-image:linear-gradient(105deg,#ffc88a 42%,#fff6e8 50%,#ffc88a 58%)}
+  background-size:300% 100%;animation:payalTextShine 3.8s ease-in-out infinite}
+.festive,.plan.dw .offer,.plan .now,.price .now{background-image:linear-gradient(105deg,#ffb066 46%,#fff1db 50%,#ffb066 54%)}
+.plan .now,.price .now{animation-delay:.8s}
+.obar-p{background-image:linear-gradient(105deg,#ffa046 46%,#fff1dc 50%,#ffa046 54%);animation-delay:.4s}
+.launchline{background-image:linear-gradient(105deg,#ffc88a 46%,#fff6e8 50%,#ffc88a 54%)}
 .launchline b{-webkit-text-fill-color:#fff}
-@media (prefers-reduced-motion:reduce){.pill::after,.obar-btn::after,[data-apk]::after,.bigbtn::after{display:none}.festive,.plan.dw .offer,.plan .now,.price .now,.obar-p,.launchline{animation:none}}
+.pill .shtxt{background-image:linear-gradient(105deg,#f3efe8 46%,#ffd9a8 50%,#f3efe8 54%)}
+.obar-btn .shtxt,[data-apk] .shtxt{background-image:linear-gradient(105deg,#2a1100 44%,#fff2df 50%,#2a1100 56%);animation-delay:1.4s}
+@media (prefers-reduced-motion:reduce){.shtxt,.festive,.plan.dw .offer,.plan .now,.price .now,.obar-p,.launchline{animation:none}}
