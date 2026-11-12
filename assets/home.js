@@ -20,7 +20,7 @@
     var t=end-Date.now();
     if(t<=0){document.documentElement.classList.add('offer-over');[bar,ll,cb].forEach(function(e){if(e)e.hidden=true;});return false;}
     var s=Math.floor(t/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60),x=s%60;
-    var hms=p(d*24+h)+':'+p(m)+':'+p(x);
+    var hms=(d>0?d+'d ':'')+p(h)+':'+p(m)+':'+p(x);
     Array.prototype.forEach.call(document.querySelectorAll('[data-cd]'),function(e){
       var k=e.getAttribute('data-cd');e.textContent=k==='hms'?hms:k==='d'?p(d):k==='h'?p(h):k==='m'?p(m):p(x);});
     [bar,ll,cb].forEach(function(e){if(e)e.hidden=false;});

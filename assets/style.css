@@ -15,7 +15,7 @@ h1,h2,h3,h4{font-family:'Poppins','Noto Sans Devanagari',sans-serif;line-height:
 .wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
 html[lang=hi] .en{display:none!important}
 html[lang=en] .hi{display:none!important}
-.grad{background:linear-gradient(180deg,#ffd98a,#ff8a2a);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.grad{background:linear-gradient(180deg,#ffc88a,#ff8a2a);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 .i{width:1.15em;height:1.15em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
@@ -264,7 +264,7 @@ footer{border-top:1px solid var(--line);padding:50px 0 36px;background:#16151a}
 /* ---- Maya-style header and centred hero card ---- */
 .nav{background:#2a292e;border-bottom:1px solid rgba(255,255,255,.08)}
 .nav::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#ff8a2a 0,#f0852e 55%,#e0457b 100%)}
-.brand .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(180deg,#ffc659,#ff8a2a);color:#1b1a1e;display:inline-flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:800;font-size:22px;box-shadow:none}
+.brand .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(180deg,#ffa046,#ff8a2a);color:#1b1a1e;display:inline-flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:800;font-size:22px;box-shadow:none}
 .brand .bt{font-weight:400;color:#cfcdd4}.brand .bt b{font-weight:700;color:#fff}
 .nav .dl-top{display:none}
 .hero2{padding:22px 0 14px}
@@ -272,10 +272,10 @@ footer{border-top:1px solid var(--line);padding:50px 0 36px;background:#16151a}
 .pill{display:inline-flex;align-items:center;gap:10px;padding:10px 26px;border-radius:999px;border:1px solid rgba(255,138,42,.4);background:#3b2430;color:#f3ecf5;font-weight:700;font-size:15px}
 .pill .i{color:var(--gold)}
 .herocard h1{font-size:clamp(38px,9vw,64px);font-weight:800;margin:28px 0 12px;line-height:1.12;letter-spacing:-.02em}
-.herocard h1 .grad{display:block;-webkit-text-fill-color:#f0b43c;color:#f0b43c;background:none;text-shadow:0 0 28px rgba(255,138,42,.45)}
+.herocard h1 .grad{display:block;-webkit-text-fill-color:#ffa046;color:#ffa046;background:none;text-shadow:0 0 28px rgba(255,138,42,.45)}
 .rot{font-family:'Poppins',sans-serif;font-weight:600;font-size:24px;color:var(--gold);margin:22px 0 20px;min-height:36px}
 .herocard .lead{margin:0 auto 26px;max-width:560px;color:#9c9aa3;font-size:17px;line-height:1.75}
-.bigbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:20px 18px;border-radius:20px;background:linear-gradient(180deg,#f6b83c,#eba62b);color:#1b1a1e;font-weight:700;font-size:20px;box-shadow:0 10px 26px rgba(255,138,42,.25)}
+.bigbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:20px 18px;border-radius:20px;background:linear-gradient(180deg,#ff9a3a,#f2701c);color:#1b1a1e;font-weight:700;font-size:20px;box-shadow:0 10px 26px rgba(255,138,42,.25)}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
 .tile{display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;background:#3d3c41;border:1px solid rgba(255,255,255,.06);text-align:left;min-width:0}
 .tile .tb{flex:none;width:60px;height:60px;border-radius:16px;background:#4a4437;border:1px solid rgba(255,138,42,.25);display:flex;align-items:center;justify-content:center;color:var(--gold)}
@@ -320,7 +320,7 @@ html{zoom:.72}
 .offerbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 10px;padding:9px 14px;background:linear-gradient(90deg,#3b2430,#4a3520);border-bottom:1px solid rgba(255,138,42,.35);color:#ffe3a8;font-size:14px;text-align:center}
 .offerbar .i{color:var(--gold)}.offerbar b{color:#fff}.offerbar .cd{font-variant-numeric:tabular-nums;color:var(--gold2)}
 .offerbar .ofsep{opacity:.5}
-.launchline{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px 0 0;color:#ffd98a;font-size:15px;font-weight:600}
+.launchline{display:flex;align-items:center;justify-content:center;gap:8px;margin:18px 0 0;color:#ffc88a;font-size:15px;font-weight:600}
 .launchline .i{color:var(--gold)}.launchline .cd{font-variant-numeric:tabular-nums;color:#fff}
 .cdbox{display:flex;justify-content:center;gap:12px;margin:6px 0 22px}
 .cdbox div{min-width:64px;padding:12px 8px;border-radius:14px;background:#17161a;border:1px solid rgba(255,255,255,.09)}
@@ -344,7 +344,7 @@ footer{padding:26px 0 30px;border:0;background:transparent}
 .flegal{margin-top:26px}
 .addrcard{margin-top:30px;padding:16px 18px;border-radius:18px;background:#2b2a30;border:1px solid rgba(255,255,255,.07);color:#b4b2bb;font-size:14.5px;line-height:1.55;display:grid;grid-template-columns:22px 1fr;gap:4px 10px}
 .addrcard .i{color:var(--gold);width:20px;height:20px;margin-top:3px}.addrcard .ap{grid-column:2;margin-top:2px}
-.festive{display:flex;align-items:center;justify-content:center;gap:14px;margin:34px 0 22px;font-family:'Poppins',sans-serif;font-weight:700;font-size:23px;color:#ffc766}
+.festive{display:flex;align-items:center;justify-content:center;gap:14px;margin:34px 0 22px;font-family:'Poppins',sans-serif;font-weight:700;font-size:23px;color:#ffb066}
 .festive .i{color:var(--gold);width:24px;height:24px}
 .copycard{padding:16px;border-radius:18px;background:#2b2a30;border:1px solid rgba(255,255,255,.07);text-align:center;color:#a7a5ae;font-size:14.5px;display:grid;gap:8px}
 @media(min-width:900px){.footin{padding:44px 48px}.flegal{margin-top:0}.fcols{max-width:520px}}
@@ -382,7 +382,7 @@ footer{padding:26px 0 30px;border:0;background:transparent}
 .prodprice{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
 .prodprice b{font-family:'Poppins',sans-serif;font-size:44px;color:#fff;line-height:1}
 .prodprice span{color:#a9a7b0;font-size:15px}
-.after,.plan .save{display:inline-block;padding:8px 16px;border-radius:999px;background:linear-gradient(90deg,#3a1f3d,#1f2240);border:1px solid rgba(255,138,42,.45);color:#ffd98a;font-weight:700;font-size:15px;box-shadow:0 0 18px rgba(255,138,42,.12);margin:0 0 18px}
+.after,.plan .save{display:inline-block;padding:8px 16px;border-radius:999px;background:linear-gradient(90deg,#3a1f3d,#1f2240);border:1px solid rgba(255,138,42,.45);color:#ffc88a;font-weight:700;font-size:15px;box-shadow:0 0 18px rgba(255,138,42,.12);margin:0 0 18px}
 .checks{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:14px}
 .checks li{display:grid;grid-template-columns:22px 1fr;gap:12px;color:#c9c7d0;font-size:16px;line-height:1.45}
 .checks .i{color:var(--gold);width:20px;height:20px;margin-top:2px}
@@ -399,11 +399,11 @@ footer{padding:26px 0 30px;border:0;background:transparent}
 .plan.dw::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#ff8a2a,#f0852e,#e0457b)}
 .plan.dw .pat{position:absolute;right:-30px;top:-30px;width:230px;height:230px;background:url(rangoli.svg) center/contain no-repeat;opacity:.28;pointer-events:none}
 .plan.dw>*{position:relative}.plan.dw>.pat{position:absolute}
-.plan.dw .offer{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:#ffc766}
+.plan.dw .offer{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:15px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:#ffb066}
 .plan.dw .offer::before{content:"";width:9px;height:9px;border-radius:50%;background:#ff8a2a;box-shadow:0 0 12px #ff8a2a}
 .plan.dw h3{font-family:'Poppins',sans-serif;font-size:30px;line-height:1.18;color:#fff;margin:0 0 6px;padding-right:46px}
 .plan.dw .price{display:flex;align-items:baseline;gap:12px;margin:6px 0 14px}
-.plan.dw .now{font-family:'Poppins',sans-serif;font-weight:800;font-size:52px;line-height:1;color:#ffc766;text-shadow:0 0 22px rgba(255,138,42,.4)}
+.plan.dw .now{font-family:'Poppins',sans-serif;font-weight:800;font-size:52px;line-height:1;color:#ffb066;text-shadow:0 0 22px rgba(255,138,42,.4)}
 .plan.dw .per{color:#cfc8d8;font-size:17px}
 .plan.dw .save{margin:0 0 16px;font-size:16px}
 .plan-cd{margin:0 0 18px;padding:16px 18px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:rgba(10,8,20,.35)}
@@ -416,7 +416,7 @@ footer{padding:26px 0 30px;border:0;background:transparent}
 .plan.dw li{display:grid;grid-template-columns:22px 1fr;gap:12px;color:#ece8f3;font-size:16px;line-height:1.45}
 .plan.dw li .i{width:19px;height:19px;margin-top:2px;color:#3ddc97}
 .plan.dw li.no{color:#8f88a0}.plan.dw li.no .i{color:#e0457b}
-.plan.dw .cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:18px;border-radius:16px;font-size:18px;font-weight:700;border:0;cursor:pointer;background:linear-gradient(180deg,#f6b83c,#eba62b);color:#1b1a1e;box-shadow:0 10px 26px rgba(255,138,42,.28)}
+.plan.dw .cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:18px;border-radius:16px;font-size:18px;font-weight:700;border:0;cursor:pointer;background:linear-gradient(180deg,#ff9a3a,#f2701c);color:#1b1a1e;box-shadow:0 10px 26px rgba(255,138,42,.28)}
 .plan.dw .cta .i{width:20px;height:20px}
 .plan.dw .t-reg{display:none}
 .offer-over .plan.dw .t-offer{display:none}.offer-over .plan.dw .t-reg{display:block}
