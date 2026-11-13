@@ -3,12 +3,15 @@ window.PAYAL = {
   apkUrl: "https://payalapp.in/download/payal.apk",
   apkVersion: "v59",
   apkBuild: 123,
+  /* the version people see on the site (apkVersion and apkBuild stay as they are; the app reads apkBuild) */
+  apkVersionName: "1.0.19",
   apkSize: "26 MB",
   apkSha256: "078b19afae266a1475777ef4c16bee672df99a2208dd5190de8a52927ebb90f8",
   whatsapp: "",
   email: "asmaulsheikh47364@gmail.com",
   paymentsLive: false,
-  /* Offer countdown: change this date to end the offer sooner or later. Empty string hides every countdown. */
+  /* Offer countdown: change this date to end the offer sooner or later. Empty string hides every countdown.
+     The site shows only when the offer ends, never a "price after the offer" (mrp is not shown as a future price). */
   offerName: "Chhath Puja ki Shubhkamnayein",
   offerEnds: "2026-11-16T23:59:59+05:30",
   supabaseUrl: "https://hwfifqyssabwwdjlbqty.supabase.co",
@@ -20,5 +23,6 @@ window.PAYAL = {
   ]
 };
 
-/* HIDE_SHA */
-document.addEventListener("DOMContentLoaded", function () { var e = document.getElementById("sha"); if (e) e.style.display = "none"; });
+/* HIDE_SHA: false = the SHA-256 line is shown so careful users can check the downloaded file. */
+var HIDE_SHA = false;
+document.addEventListener("DOMContentLoaded", function () { var e = document.getElementById("sha"); if (e && HIDE_SHA) e.style.display = "none"; });

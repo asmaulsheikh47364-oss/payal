@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /payal/admin.html
+Disallow: /admin.html
 Sitemap: https://payalapp.in/sitemap.xml

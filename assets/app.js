@@ -67,37 +67,30 @@
     a.target = "_blank"; a.rel = "noopener";
   });
   $$("[data-mail]").forEach(function (e) { if (C.email) e.href = "mailto:" + C.email; });
-  $$("[data-v]").forEach(function (e) { e.textContent = C.apkVersion || ""; });
+  /* shown version: the readable name (e.g. 1.0.19); apkVersion and apkBuild stay as they are for the app's update check */
+  $$("[data-v]").forEach(function (e) { e.textContent = C.apkVersionName ? "v" + C.apkVersionName : (C.apkVersion || ""); });
   $$("[data-size]").forEach(function (e) { e.textContent = C.apkSize || ""; });
   var sh = $("#sha"); if (sh && C.apkSha256 && C.apkSha256.indexOf("__") < 0) sh.textContent = "SHA-256: " + C.apkSha256;
   $$("[data-year]").forEach(function (e) { e.textContent = new Date().getFullYear(); });
 
-  /* plans: prices, discount and saving are computed from config */
-  function nextDay() {
-    var t = C.offerEnds ? Date.parse(C.offerEnds) : NaN;
-    if (isNaN(t)) return "";
-    var loc = (window.PAYAL_LANG === "hi" ? "hi-IN" : window.PAYAL_LANG === "bn" ? "bn-IN" : "en-IN") + "-u-nu-latn";
-    return new Date(t + 1000).toLocaleDateString(loc, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
-  }
+  /* plans: the current price comes from config / the server. No "price after the offer" is ever shown:
+     a future price is not a fixed fact, so only the offer's end time is shown (countdown). */
   var lastPlans = null;
   function applyPlans(list) {
     lastPlans = list;
-    var nd = nextDay();
+    var offerOn = !!(C.offerEnds && Date.parse(C.offerEnds) > Date.now());
     (list || []).forEach(function (p) {
       var rupee = "\u20b9" + p.price;
       $$('[data-p="' + p.id + '"]').forEach(function (e) { e.textContent = rupee; });
-      var after = p.mrp > p.price && p.price > 0 ? PT("After the offer") + " \u20b9" + p.mrp + (nd ? " \u00b7 " + PT("from {d}").replace("{d}", nd) : "") : "";
-      $$('[data-after="' + p.id + '"]').forEach(function (e) { e.textContent = after; e.style.display = after ? "" : "none"; });
+      $$('[data-after="' + p.id + '"]').forEach(function (e) { e.textContent = ""; e.style.display = "none"; });
       var el = $("#plan-" + p.id); if (!el) return;
       var now = $(".now", el), mrp = $(".mrp", el), save = $(".save", el), off = $(".offer", el);
       if (now) now.textContent = p.price === 0 ? "\u20b90" : rupee;
       if (mrp) mrp.style.display = "none";
-      if (after) {
-        if (save) { save.style.display = "inline-block"; save.textContent = after; }
-        if (off && !off.classList.contains("static")) { off.textContent = PT(C.offerName || "Chhath Puja ki Shubhkamnayein"); off.style.display = ""; }
-      } else {
-        if (save) save.style.display = "none";
-        if (off && !off.classList.contains("static")) { off.textContent = ""; off.style.display = "none"; }
+      if (save) save.style.display = "none";
+      if (off && !off.classList.contains("static")) {
+        if (offerOn && p.price > 0 && p.mrp > p.price) { off.textContent = PT(C.offerName || "Chhath Puja ki Shubhkamnayein"); off.style.display = ""; }
+        else { off.textContent = ""; off.style.display = "none"; }
       }
     });
   }
@@ -208,13 +201,13 @@
           var sw = document.getElementById("swap"); if (sw) sw.hidden = false;
           var al = document.getElementById("adminlink"); if (al) al.hidden = false;
           var d = document.getElementById("m-dash");
-          if (d && !document.getElementById("m-admin")) { var a = document.createElement("a"); a.className = "l"; a.id = "m-admin"; a.href = "admin.html"; a.textContent = "Admin"; d.parentNode.insertBefore(a, d.nextSibling); }
+          if (d && !document.getElementById("m-admin")) { var a = document.createElement("a"); a.className = "l"; a.id = "m-admin"; a.href = "/admin.html"; a.textContent = "Admin"; d.parentNode.insertBefore(a, d.nextSibling); }
         });
     }).catch(function () {});
   } catch (e) {}
 })();
 
-/* Festival sale strip: countdown "6d 03:35:59", the price after the offer with its date, and the close button. */
+/* Festival sale strip: countdown "6d 03:35:59", the day and time the offer ends (no price after the offer), and the close button. */
 (function () {
   var C = window.PAYAL || {}, bar = document.getElementById("obar");
   if (!bar) return;
@@ -224,12 +217,11 @@
   function p(n) { return (n < 10 ? "0" : "") + n; }
   var cd = document.getElementById("obar-cd"), af = document.getElementById("obar-after");
   function after() {
-    var pro = null; (C.plans || []).forEach(function (x) { if (x.id === "pro") pro = x; });
-    var mrp = pro && pro.mrp > pro.price ? pro.mrp : 0;
-    if (!af || !mrp) return;
+    if (!af) return;
     var l = window.PAYAL_LANG || "en", loc = (l === "hi" ? "hi-IN" : l === "bn" ? "bn-IN" : "en-IN") + "-u-nu-latn";
-    var d = new Date(end + 60000).toLocaleDateString(loc, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
-    af.textContent = (window.PT ? PT("From {d}") : "From {d}").replace("{d}", d) + " \u20b9" + mrp;
+    var d = new Date(end).toLocaleDateString(loc, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
+    var tm = new Date(end).toLocaleTimeString(loc, { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).toLowerCase();
+    af.textContent = (window.PT ? PT("Ends {d}, {t}") : "Ends {d}, {t}").replace("{d}", d).replace("{t}", tm);
   }
   function tick() {
     var t = end - Date.now();
