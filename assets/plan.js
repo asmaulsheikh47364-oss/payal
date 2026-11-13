@@ -118,7 +118,7 @@
   var checking = false, notConfirmed = false;
   function prevExp() { try { var v = sessionStorage.getItem("payal_prev_exp_" + plan); return v === null ? null : v; } catch (e) { return null; } }
   function planActive(s) {
-    if (!s || s.tier !== plan || !s.expires_at) return false;
+    if (!s || !s.expires_at || !(s.tier === plan || (plan === "plus" && s.tier === "pro"))) return false;
     var exp = Date.parse(s.expires_at);
     if (isNaN(exp) || exp <= Date.now()) return false;
     /* if the plan was already running before this payment, it counts only when its end date moved forward */
