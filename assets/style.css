@@ -389,7 +389,7 @@ footer{padding:26px 0 30px;border:0;background:transparent}
 .exbtn{display:flex;align-items:center;justify-content:center;gap:10px;padding:17px;border-radius:16px;background:#3b3425;border:1px solid rgba(255,138,42,.4);color:var(--gold2);font-weight:700;font-size:18px}
 .exbtn .i{width:20px;height:20px}
 .plan .mrp{display:none!important}
-.offer-over .after,.offer-over .plan .save,.offer-over .plan .offer,.offer-over .offerlabel,.offer-over [data-after]{display:none!important}
+.offer-over .after,.offer-over .plan .save,.offer-over .plan .offer,.offer-over .offerlabel,.offer-over [data-after],.offer-over .herocard>.pill,.offer-over .festive{display:none!important}
 .plan .save{width:fit-content;max-width:100%}
 
 /* ---- heavy Diwali plan cards ---- */

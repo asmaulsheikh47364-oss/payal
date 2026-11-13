@@ -52,10 +52,9 @@
   }
 
   function offerName() {
-    var l = window.PAYAL_LANG;
-    var n = l === "hi" ? info.offerHi : info.offerEn;
-    n = n || info.offerEn || info.offerHi;
-    return n || (window.PT ? window.PT(C.offerName || "Chhath Puja ki Shubhkamnayein") : (C.offerName || ""));
+    /* one offer name everywhere on the site: the festival name from config.js */
+    var n = C.offerName || "Chhath Puja ki Shubhkamnayein";
+    return window.PT ? window.PT(n) : n;
   }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
   function svgUse(id) {
@@ -71,7 +70,7 @@
     var card = el("div", "plan dw planbig");
     card.appendChild(el("div", "pat"));
     var on = !!(C.offerEnds && Date.parse(C.offerEnds) > Date.now());
-    var off = el("div", "offer", on || info.offerEn || info.offerHi ? offerName() : L3("Payal " + PN, "Payal " + PN, "Payal " + PN));
+    var off = el("div", "offer", on ? offerName() : L3("Payal " + PN, "Payal " + PN, "Payal " + PN));
     card.appendChild(off);
     card.appendChild(el("h3", "", "Payal " + PN));
     var price = el("div", "price");
@@ -123,6 +122,8 @@
     if (isNaN(exp) || exp <= Date.now()) return false;
     /* if the plan was already running before this payment, it counts only when its end date moved forward */
     var before = prevExp();
+    /* a higher plan that was not saved before this payment does not prove this payment worked */
+    if (!before && s.tier !== plan) return false;
     if (before) { var b = Date.parse(before); if (!isNaN(b) && exp <= b) return false; }
     return true;
   }
@@ -235,7 +236,8 @@
           if (o.error) { busy(false); stat("err", String(o.error)); return; }
           return loadRzp().then(function () {
             busy(false);
-            try { sessionStorage.setItem("payal_prev_exp_" + plan, current && current.tier === plan && current.expires_at ? String(current.expires_at) : ""); } catch (e) {}
+            try { var curExp = current && current.expires_at ? Date.parse(current.expires_at) : NaN;
+            sessionStorage.setItem("payal_prev_exp_" + plan, !isNaN(curExp) && curExp > Date.now() && (current.tier === plan || (plan === "plus" && current.tier === "pro")) ? String(current.expires_at) : ""); } catch (e) {}
             var rz = new window.Razorpay({
               key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + " - 30 days",
               order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#f0ac2e" },
