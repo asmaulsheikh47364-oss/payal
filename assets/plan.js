@@ -100,7 +100,7 @@
     var st = el("div", "pstat"); st.id = "pstat"; st.setAttribute("aria-live", "polite"); st.hidden = true; card.appendChild(st);
     if (tier === plan && !paidNow && !checking) {
       st.hidden = false; st.className = "pstat info";
-      st.textContent = L3("You already have " + PN + ". If you want to buy again before your plan ends, contact us first.", "आपके पास " + PN + " पहले से है। प्लान ख़त्म होने से पहले फिर खरीदना हो तो पहले हमसे संपर्क कीजिए।", "আপনার " + PN + " আগেই আছে। প্ল্যান শেষ হওয়ার আগে আবার কিনতে চাইলে আগে আমাদের সঙ্গে যোগাযোগ করুন।");
+      st.textContent = L3("You already have " + PN + ". If you buy it again before it ends, the new days are added after your current end date.", "आपके पास " + PN + " पहले से है। ख़त्म होने से पहले फिर खरीदेंगे तो नए दिन अभी वाली आख़िरी तारीख़ के बाद जुड़ जाएँगे।", "আপনার " + PN + " আগেই আছে। শেষ হওয়ার আগে আবার কিনলে নতুন দিনগুলো এখনকার শেষ তারিখের পরে যোগ হবে।");
       var ca = el("a", "plink", L3("Contact us", "संपर्क कीजिए", "যোগাযোগ করুন")); ca.href = "contact.html";
       st.appendChild(document.createElement("br")); st.appendChild(ca);
     }
