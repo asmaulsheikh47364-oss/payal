@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://hwfifqyssabwwdjlbqty.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Payal Admin</title>
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/admin.css?v=77">
+</head><body>
+<header><a href="index.html" class="bd"><img class="av" src="assets/favicon.png" alt="Payal"><span id="who">Payal</span></a><a href="account.html" class="swapb">&#128736; Account</a><i style="flex:1"></i><button id="out" hidden>Logout</button></header>
+<main>
+<section id="login" hidden>
+  <p>Private page. Login with the owner Gmail.</p>
+  <button id="gbtn" class="pri">Login with Google</button>
+  <p id="err" class="bad"></p>
+</section>
+<section id="denied" hidden><p class="bad">Access denied.</p></section>
+<section id="app" hidden>
+  <nav id="tabs"></nav>
+  <div id="view"></div>
+</section>
+<div id="toast"></div>
+</main>
+<!-- TODO: add integrity="sha384-..." crossorigin="anonymous" to this exact pinned file (2.45.0). Get the hash from the jsDelivr page of this file (SRI button) or: curl -s URL | openssl dgst -sha384 -binary | openssl base64 -A -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+<script src="assets/config.js?v=78"></script>
+<script src="assets/login.js?v=77"></script>
+<script src="assets/admin.js?v=77"></script>
+</body></html>

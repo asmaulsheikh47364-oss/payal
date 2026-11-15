@@ -1,0 +1,272 @@
+(function () {
+  var C = window.PAYAL || {};
+  var $ = function (s) { return document.querySelector(s); };
+  function L3(en, hi, bn) { return window.L ? window.L(en, hi, bn) : en; }
+  var m = /[?&]plan=(plus|pro)/.exec(location.search);
+  if (!m) { location.replace("index.html#plans"); return; }
+  var plan = m[1];
+  var PN = plan === "pro" ? "Pro" : "Plus";
+
+  function show(id) { ["loading", "login", "pv"].forEach(function (x) { var e = $("#" + x); if (e) e.hidden = x !== id; }); }
+  function topErr(t) { var e = $("#perr"); if (e) e.textContent = t || ""; }
+  function stat(kind, text, linkHref, linkText) {
+    var s = $("#pstat"); if (!s) { topErr(text); return; }
+    s.className = "pstat " + (kind || "");
+    s.textContent = text || "";
+    if (linkHref) { var a = document.createElement("a"); a.href = linkHref; a.textContent = linkText; a.className = "plink"; s.appendChild(document.createElement("br")); s.appendChild(a); }
+    s.hidden = !text;
+    if (text) { try { s.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {} }
+  }
+
+  if (!window.supabase || !C.supabaseUrl) { show("login"); renderLogin(); topErr(L3("Server not connected", "सर्वर से जुड़ नहीं सका", "সার্ভারের সঙ্গে সংযোগ হয়নি")); return; }
+  var sb = window.supabase.createClient(C.supabaseUrl, C.supabaseAnonKey, { auth: { persistSession: true, detectSessionInUrl: true } });
+
+  /* ---- what each plan gives ---- */
+  var ROWS = [
+    { t: ["Live voice conversation, no time limit", "लाइव आवाज़ बातचीत, कोई समय सीमा नहीं", "লাইভ ভয়েস কথোপকথন, কোনো সময়সীমা নেই"], plus: 1, pro: 1 },
+    { t: ["Four characters and voices", "चारों किरदार और आवाज़ें", "চারটি চরিত্র ও কণ্ঠস্বর"], plus: 1, pro: 1 },
+    { t: ["Typed chat with Payal", "Payal से टाइप करके चैट", "Payal-এর সঙ্গে টাইপ করে চ্যাট"], plus: 1, pro: 1 },
+    { t: ["Camera and photo understanding", "कैमरा और फ़ोटो समझना", "ক্যামেরা ও ছবি বোঝা"], plus: 1, pro: 1 },
+    { t: ["Location and map", "लोकेशन और मैप", "লোকেশন ও ম্যাপ"], plus: 1, pro: 1 },
+    { t: ["Normal web search", "सामान्य वेब सर्च", "সাধারণ ওয়েব সার্চ"], plus: 1, pro: 1 },
+    { t: ["Phone control (open apps, calls, settings)", "फ़ोन कंट्रोल (ऐप खोलना, कॉल, सेटिंग)", "ফোন কন্ট্রোল (অ্যাপ খোলা, কল, সেটিং)"], plus: 0, pro: 1 },
+    { t: ["Screen reading", "स्क्रीन पढ़ना", "স্ক্রিন পড়া"], plus: 0, pro: 1 },
+    { t: ["Deep research search", "गहरी रिसर्च सर्च", "গভীর রিসার্চ সার্চ"], plus: 0, pro: 1 },
+    { t: ["Build websites and coding partner", "वेबसाइट बनाना और कोडिंग साथी", "ওয়েবসাইট বানানো ও কোডিং সঙ্গী"], plus: 0, pro: 1 }
+  ];
+
+  var info = null; /* price, mrp, offer names */
+  function planInfo() {
+    var fb = null;
+    (C.plans || []).forEach(function (x) { if (x.id === plan) fb = x; });
+    return fb || { id: plan, price: plan === "pro" ? 99 : 49, mrp: plan === "pro" ? 399 : 199, offerHi: "", offerEn: "" };
+  }
+  info = planInfo();
+  function loadInfo() {
+    return fetch(C.supabaseUrl + "/rest/v1/rpc/public_plans", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: "{}" })
+      .then(function (r) { return r.json(); })
+      .then(function (rows) {
+        if (!Array.isArray(rows)) return;
+        rows.forEach(function (x) { if (x.id === plan) info = { id: plan, price: x.price, mrp: x.mrp, offerHi: x.offerHi || "", offerEn: x.offerEn || "" }; });
+      }).catch(function () {});
+  }
+
+  function offerName() {
+    /* one offer name everywhere on the site: the festival name from config.js */
+    var n = C.offerName || "Chhath Puja ki Shubhkamnayein";
+    return window.PT ? window.PT(n) : n;
+  }
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function svgUse(id) {
+    var s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("class", "i"); s.setAttribute("aria-hidden", "true");
+    var u = document.createElementNS("http://www.w3.org/2000/svg", "use"); u.setAttribute("href", "#" + id); s.appendChild(u); return s;
+  }
+
+  var current = null; /* status from web_status */
+  function renderPlan() {
+    stopQr();
+    var box = $("#pv"); box.textContent = "";
+    $("#backtxt").textContent = L3("All plans", "सारे प्लान", "সব প্ল্যান");
+    var card = el("div", "plan dw planbig");
+    card.appendChild(el("div", "pat"));
+    var on = !!(C.offerEnds && Date.parse(C.offerEnds) > Date.now());
+    var off = el("div", "offer", on ? offerName() : L3("Payal " + PN, "Payal " + PN, "Payal " + PN));
+    card.appendChild(off);
+    card.appendChild(el("h3", "", "Payal " + PN));
+    var price = el("div", "price");
+    price.appendChild(el("span", "now", "₹" + info.price));
+    price.appendChild(el("span", "per", L3("/ 30 days", "/ 30 दिन", "/ ৩০ দিন")));
+    card.appendChild(price);
+    if (on) {
+      var cd = el("div", "plan-cd"); cd.appendChild(el("small", "", L3("Offer ends in", "ऑफ़र ख़त्म होने में", "অফার শেষ হতে")));
+      var b = el("b", "cdh"); b.setAttribute("data-cd", "hms"); b.setAttribute("data-noi18n", ""); b.textContent = "--:--:--"; cd.appendChild(b); card.appendChild(cd);
+    }
+    card.appendChild(el("p", "psub", L3("Here is exactly what you get with " + PN + " and what you do not.", PN + " में आपको ठीक-ठीक क्या मिलेगा और क्या नहीं, नीचे देखिए।", PN + "-এ ঠিক কী পাবেন আর কী পাবেন না, নিচে দেখুন।")));
+    var ul = el("ul", "rows");
+    ROWS.forEach(function (r) {
+      var yes = r[plan] === 1;
+      var li = el("li", yes ? "yes" : "no");
+      li.appendChild(svgUse(yes ? "i-check" : "i-x"));
+      li.appendChild(el("span", "", L3(r.t[0], r.t[1], r.t[2])));
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    var tier = current && current.tier;
+    var btn = el("button", "btn primary cta", L3("Buy " + PN + " for ₹" + info.price, PN + " ₹" + info.price + " में खरीदें", PN + " ₹" + info.price + "-এ কিনুন"));
+    btn.type = "button"; btn.id = "buybtn";
+    btn.addEventListener("click", buy);
+    card.appendChild(btn);
+    var st = el("div", "pstat"); st.id = "pstat"; st.setAttribute("aria-live", "polite"); st.hidden = true; card.appendChild(st);
+    if (tier === plan && !paidNow && !checking) {
+      st.hidden = false; st.className = "pstat info";
+      st.textContent = L3("You already have " + PN + ". If you buy it again before it ends, the new days are added after your current end date.", "आपके पास " + PN + " पहले से है। ख़त्म होने से पहले फिर खरीदेंगे तो नए दिन अभी वाली आख़िरी तारीख़ के बाद जुड़ जाएँगे।", "আপনার " + PN + " আগেই আছে। শেষ হওয়ার আগে আবার কিনলে নতুন দিনগুলো এখনকার শেষ তারিখের পরে যোগ হবে।");
+      var ca = el("a", "plink", L3("Contact us", "संपर्क कीजिए", "যোগাযোগ করুন")); ca.href = "contact.html";
+      st.appendChild(document.createElement("br")); st.appendChild(ca);
+    }
+    card.appendChild(el("p", "pnote", L3("30 days, never renews by itself. One Gmail, one phone.", "30 दिन चलता है, अपने-आप दोबारा नहीं कटता। एक Gmail, एक फ़ोन।", "৩০ দিন চলে, নিজে থেকে আর কাটে না। এক Gmail, এক ফোন।")));
+    var bn = banner();
+    if (bn) box.appendChild(bn);
+    box.appendChild(card);
+    show("pv");
+  }
+
+  /* ---- result banner (after the full payment page sends the customer back) ----
+     "Payment Successful" is shown ONLY after the server (web_status) says this plan is active.
+     ?pay=ok in the address alone only starts the check. */
+  var payParam = (/[?&]pay=(ok|failed|pending|cancel)/.exec(location.search) || [])[1] || "";
+  var checking = false, notConfirmed = false;
+  function prevExp() { try { var v = sessionStorage.getItem("payal_prev_exp_" + plan); return v === null ? null : v; } catch (e) { return null; } }
+  function planActive(s) {
+    if (!s || !s.expires_at || !(s.tier === plan || (plan === "plus" && s.tier === "pro"))) return false;
+    var exp = Date.parse(s.expires_at);
+    if (isNaN(exp) || exp <= Date.now()) return false;
+    /* if the plan was already running before this payment, it counts only when its end date moved forward */
+    var before = prevExp();
+    /* a higher plan that was not saved before this payment does not prove this payment worked */
+    if (!before && s.tier !== plan) return false;
+    if (before) { var b = Date.parse(before); if (!isNaN(b) && exp <= b) return false; }
+    return true;
+  }
+  function confirmPlan(tries) {
+    checking = true; notConfirmed = false;
+    renderPlan();
+    var n = 0;
+    (function once() {
+      n++;
+      sb.rpc("web_status").then(function (r) { return r && !r.error ? r.data : null; }).catch(function () { return null; }).then(function (s) {
+        if (s) current = s;
+        if (planActive(s)) {
+          checking = false; paidNow = true;
+          try { sessionStorage.removeItem("payal_prev_exp_" + plan); } catch (e) {}
+          renderPlan(); try { window.scrollTo(0, 0); } catch (e) {}
+          return;
+        }
+        if (n < tries) { setTimeout(once, 3000); return; }
+        checking = false; notConfirmed = true; renderPlan();
+      });
+    })();
+  }
+  function checkingBox() {
+    var d = el("div", "pstat info", L3("Checking your payment...", "पेमेंट जाँच रहे हैं...", "পেমেন্ট যাচাই হচ্ছে..."));
+    d.style.marginBottom = "14px"; return d;
+  }
+  function notYetBox() {
+    var d = el("div", "pstat info", L3("We could not confirm your payment yet. If money was cut, your plan switches on by itself once the payment is confirmed. Open your account to check, or send us the Payment ID from there.", "आपका पेमेंट अभी पक्का नहीं हो सका। अगर पैसा कटा है तो पेमेंट पक्का होते ही प्लान अपने-आप चालू हो जाएगा। अपना खाता खोलकर देखिए, या वहीं से हमें पेमेंट ID भेजिए।", "আপনার পেমেন্ট এখনও নিশ্চিত করা যায়নি। টাকা কাটলে পেমেন্ট নিশ্চিত হলেই প্ল্যান নিজে থেকে চালু হবে। অ্যাকাউন্ট খুলে দেখুন, অথবা সেখান থেকে আমাদের পেমেন্ট ID পাঠান।"));
+    var a = el("a", "plink", L3("Open my account", "मेरा खाता खोलिए", "আমার অ্যাকাউন্ট খুলুন")); a.href = "account.html";
+    d.appendChild(document.createElement("br")); d.appendChild(a);
+    d.style.marginBottom = "14px"; return d;
+  }
+  function successBox() {
+    var d = el("div", "pstat ok big");
+    d.appendChild(el("div", "bigline", "\u2705 Payment Successful"));
+    d.appendChild(el("div", "", L3("Verified. Your " + PN + " plan is now active. Open the app and log in with the same Gmail.", "पक्का हो गया। आपका " + PN + " प्लान अब चालू है। ऐप खोलकर उसी Gmail से लॉग इन कीजिए।", "যাচাই হয়েছে। আপনার " + PN + " প্ল্যান এখন চালু। অ্যাপ খুলে একই Gmail দিয়ে লগ ইন করুন।")));
+    var a = el("a", "plink", L3("Go to my account and download the app", "मेरा खाता खोलिए और ऐप डाउनलोड कीजिए", "আমার অ্যাকাউন্ট খুলুন ও অ্যাপ ডাউনলোড করুন")); a.href = "account.html"; d.appendChild(a);
+    return d;
+  }
+  function banner() {
+    if (paidNow) return successBox();
+    if (checking) return checkingBox();
+    if (notConfirmed) return notYetBox();
+    if (payParam === "ok") return checkingBox();
+    if (payParam === "pending") { var p = el("div", "pstat info", L3("Payment received. We are confirming it, your plan will switch on by itself in a moment.", "पेमेंट मिल गया। हम पक्का कर रहे हैं, प्लान थोड़ी देर में अपने-आप चालू हो जाएगा।", "পেমেন্ট পাওয়া গেছে। নিশ্চিত করা হচ্ছে, প্ল্যান একটু পরে নিজে থেকেই চালু হবে।")); p.style.marginBottom = "14px"; return p; }
+    if (payParam === "failed") { var f = el("div", "pstat err", L3("Payment did not complete. If money was cut, it will switch on by itself, or open your account and send us the Payment ID.", "पेमेंट पूरा नहीं हुआ। अगर पैसा कटा है तो प्लान अपने-आप चालू हो जाएगा, या खाता खोलकर पेमेंट ID भेजिए।", "পেমেন্ট সম্পূর্ণ হয়নি। টাকা কাটলে প্ল্যান নিজে থেকেই চালু হবে, নয়তো অ্যাকাউন্ট খুলে পেমেন্ট ID পাঠান।")); f.style.marginBottom = "14px"; return f; }
+    if (payParam === "cancel") { var c = el("div", "pstat info", L3("Payment cancelled. Tap Buy when you are ready.", "पेमेंट रद्द हुआ। तैयार हों तो फिर Buy दबाइए।", "পেমেন্ট বাতিল হয়েছে। তৈরি হলে আবার Buy চাপুন।")); c.style.marginBottom = "14px"; return c; }
+    return null;
+  }
+  var paidNow = false;
+
+  /* QR timers (the QR button was removed; stopQr stays so old timers can never keep running) */
+  var qrTick = null, qrPoll = null;
+  function stopQr() { clearInterval(qrTick); clearInterval(qrPoll); qrTick = null; qrPoll = null; }
+  function renderLogin() {
+    $("#backtxt").textContent = L3("All plans", "सारे प्लान", "সব প্ল্যান");
+    $("#ltitle").textContent = L3("Log in to continue with " + PN, PN + " के लिए पहले लॉग इन कीजिए", PN + "-এর জন্য আগে লগ ইন করুন");
+    $("#lsub").textContent = L3("Use the same Gmail you will use in the app. Your plan is tied to it.", "वही Gmail इस्तेमाल कीजिए जो ऐप में चलाएँगे। प्लान उसी से जुड़ेगा।", "যে Gmail অ্যাপে ব্যবহার করবেন সেটাই দিন। প্ল্যান ওটার সঙ্গে জুড়বে।");
+    $("#gbtn").textContent = "G  " + L3("Continue with Google", "Google से आगे बढ़ें", "Google দিয়ে এগিয়ে যান");
+  }
+  function startGoogle() {
+    topErr("");
+    try { sessionStorage.setItem("payal_plan", plan); sessionStorage.setItem("payal_go_t", String(Date.now())); sessionStorage.setItem("payal_hl", String(history.length)); } catch (e) {}
+    return sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + "/account.html", skipBrowserRedirect: true } })
+      .then(function (r) { if (r.error) { show("login"); renderLogin(); topErr(r.error.message); return; } if (r.data && r.data.url) { if (window.payalOpenLogin) window.payalOpenLogin(r.data.url); else location.href = r.data.url; } });
+  }
+  $("#gbtn").addEventListener("click", startGoogle);
+  /* tapping a plan on the home page goes straight to the Google account chooser */
+  function autoGo() {
+    try { var t = +sessionStorage.getItem("payal_go_t") || 0; if (Date.now() - t < 20000) return false; } catch (e) {}
+    return true;
+  }
+
+  /* ---- payment ---- */
+  function fn(path, body) {
+    return sb.auth.getSession().then(function (r) {
+      var s = r.data && r.data.session;
+      if (!s) { stat("err", L3("Please log in first.", "पहले लॉग इन कीजिए।", "আগে লগ ইন করুন।")); return null; }
+      return fetch(C.supabaseUrl + "/functions/v1/pay/" + path, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + s.access_token, "apikey": C.supabaseAnonKey }, body: JSON.stringify(body) })
+        .then(function (x) {
+          return x.json().catch(function () { return { error: "Server reply could not be read (code " + x.status + ")" }; }).then(function (j) {
+            if (!x.ok && j && !j.error) j.error = "Server error (code " + x.status + ")";
+            return j;
+          });
+        });
+    });
+  }
+  function loadRzp() {
+    return new Promise(function (ok, bad) {
+      if (window.Razorpay) { ok(); return; }
+      var t = document.createElement("script"); t.src = "https://checkout.razorpay.com/v1/checkout.js";
+      t.onload = ok; t.onerror = bad; document.head.appendChild(t);
+    });
+  }
+  function busy(on) {
+    var b = $("#buybtn"); if (!b) return;
+    b.disabled = on;
+    if (on) { b.setAttribute("data-t", b.textContent); b.textContent = L3("Opening payment...", "पेमेंट खुल रहा है...", "পেমেন্ট খুলছে..."); }
+    else if (b.getAttribute("data-t")) { b.textContent = b.getAttribute("data-t"); }
+  }
+  function buy() {
+    stat("", "");
+    busy(true);
+    fetch(C.supabaseUrl + "/rest/v1/rpc/public_settings", { method: "POST", headers: { "apikey": C.supabaseAnonKey, "Content-Type": "application/json" }, body: "{}" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || d.payments_live !== true) { busy(false); stat("info", L3("Payments are starting soon. Please come back a little later.", "पेमेंट जल्द शुरू हो रहा है। थोड़ी देर बाद फिर आइए।", "পেমেন্ট শীঘ্রই শুরু হচ্ছে। একটু পরে আবার আসুন।")); return; }
+        return fn("order", { plan: plan }).then(function (o) {
+          if (!o) { busy(false); return; }
+          if (o.error) { busy(false); stat("err", String(o.error)); return; }
+          return loadRzp().then(function () {
+            busy(false);
+            try { var curExp = current && current.expires_at ? Date.parse(current.expires_at) : NaN;
+            sessionStorage.setItem("payal_prev_exp_" + plan, !isNaN(curExp) && curExp > Date.now() && (current.tier === plan || (plan === "plus" && current.tier === "pro")) ? String(current.expires_at) : ""); } catch (e) {}
+            var rz = new window.Razorpay({
+              key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + " - 30 days",
+              order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#f0ac2e" },
+              modal: { ondismiss: function () { stat("info", L3("Payment window closed. Tap Buy when you are ready.", "पेमेंट की विंडो बंद हो गई। तैयार हों तो फिर Buy दबाइए।", "পেমেন্ট উইন্ডো বন্ধ হয়েছে। তৈরি হলে আবার Buy চাপুন।")); } },
+              handler: function (resp) {
+                stat("info", L3("Checking your payment...", "पेमेंट जाँच रहे हैं...", "পেমেন্ট যাচাই হচ্ছে..."));
+                fn("verify", resp).then(function (v) {
+                  if (v && v.ok) { confirmPlan(10); }
+                  else stat("err", (v && v.error) || L3("Payment received but not confirmed yet. It will switch on by itself, or open your account and send us the Payment ID.", "पेमेंट मिला पर अभी पक्का नहीं हुआ। वह अपने-आप चालू हो जाएगा, या खाता खोलकर पेमेंट ID भेजिए।", "পেমেন্ট পাওয়া গেছে কিন্তু এখনও নিশ্চিত হয়নি। নিজে থেকেই চালু হবে, নয়তো অ্যাকাউন্ট খুলে পেমেন্ট ID পাঠান।"), "account.html", L3("Open my account", "मेरा खाता खोलिए", "আমার অ্যাকাউন্ট খুলুন"));
+                });
+              }
+            });
+            rz.open();
+          }).catch(function () { busy(false); stat("err", L3("Payment window could not open. Check your internet and try again.", "पेमेंट की विंडो नहीं खुल सकी। इंटरनेट देखकर फिर कोशिश कीजिए।", "পেমেন্ট উইন্ডো খোলা যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।")); });
+        });
+      }).catch(function () { busy(false); stat("err", L3("Could not reach the server. Check your internet and try again.", "सर्वर तक नहीं पहुँच सके। इंटरनेट देखकर फिर कोशिश कीजिए।", "সার্ভারে পৌঁছানো যায়নি। ইন্টারনেট দেখে আবার চেষ্টা করুন।")); });
+  }
+
+  function start(session) {
+    if (!session) { renderLogin(); if (autoGo()) { show("loading"); startGoogle(); } else show("login"); return; }
+    try { sessionStorage.removeItem("payal_plan"); } catch (e) {}
+    sb.rpc("web_status").then(function (r) { current = r && r.data ? r.data : null; }).catch(function () {}).then(function () { return loadInfo(); }).then(function () {
+      renderPlan();
+      if (payParam === "ok" && !paidNow) confirmPlan(10);
+    });
+  }
+  document.addEventListener("payal:lang", function () {
+    if (!$("#pv").hidden) renderPlan(); else renderLogin();
+  });
+  sb.auth.getSession().then(function (r) { start(r.data && r.data.session); });
+  sb.auth.onAuthStateChange(function (ev, session) { if (ev === "SIGNED_OUT") { renderLogin(); show("login"); } });
+})();
