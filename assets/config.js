@@ -12,8 +12,8 @@ window.PAYAL = {
   paymentsLive: false,
   /* Offer countdown: change this date to end the offer sooner or later. Empty string hides every countdown.
      The site shows only when the offer ends, never a "price after the offer" (mrp is not shown as a future price). */
-  offerName: "Chhath Puja ki Shubhkamnayein",
-  offerEnds: "2026-11-16T23:59:59+05:30",
+  offerName: "Kartik Purnima ki Shubhkamnayein",
+  offerEnds: "2026-11-24T23:59:59+05:30",
   supabaseUrl: "https://hwfifqyssabwwdjlbqty.supabase.co",
   supabaseAnonKey: "sb_publishable_p_qIHrnCIUqRK7l-rkDhRw_r-O0yIWW",
   plans: [

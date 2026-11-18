@@ -89,7 +89,7 @@
       if (mrp) mrp.style.display = "none";
       if (save) save.style.display = "none";
       if (off && !off.classList.contains("static")) {
-        if (offerOn && p.price > 0 && p.mrp > p.price) { off.textContent = PT(C.offerName || "Chhath Puja ki Shubhkamnayein"); off.style.display = ""; }
+        if (offerOn && p.price > 0 && p.mrp > p.price) { off.textContent = PT(C.offerName || "Kartik Purnima ki Shubhkamnayein"); off.style.display = ""; }
         else { off.textContent = ""; off.style.display = "none"; }
       }
     });

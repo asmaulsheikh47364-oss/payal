@@ -53,7 +53,7 @@
 
   function offerName() {
     /* one offer name everywhere on the site: the festival name from config.js */
-    var n = C.offerName || "Chhath Puja ki Shubhkamnayein";
+    var n = C.offerName || "Kartik Purnima ki Shubhkamnayein";
     return window.PT ? window.PT(n) : n;
   }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
