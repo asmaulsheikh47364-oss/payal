@@ -73,23 +73,32 @@
   var sh = $("#sha"); if (sh && C.apkSha256 && C.apkSha256.indexOf("__") < 0) sh.textContent = "SHA-256: " + C.apkSha256;
   $$("[data-year]").forEach(function (e) { e.textContent = new Date().getFullYear(); });
 
-  /* plans: the current price comes from config / the server. No "price after the offer" is ever shown:
-     a future price is not a fixed fact, so only the offer's end time is shown (countdown). */
+  /* plans: the current price comes from config / the server. When the offer ends the server itself switches the
+     price to mrp at that moment (scheduled job), so "From <date>: <mrp>" is a fixed fact and is shown. */
   var lastPlans = null;
+  window.payalAfterText = function (mrp) {
+    var end = C.offerEnds ? Date.parse(C.offerEnds) : NaN;
+    if (isNaN(end) || end <= Date.now() || !(mrp > 0)) return "";
+    var l = window.PAYAL_LANG || "en", loc = (l === "hi" ? "hi-IN" : l === "bn" ? "bn-IN" : "en-IN") + "-u-nu-latn";
+    var d = new Date(end + 1000).toLocaleDateString(loc, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
+    return (window.PT ? PT("From {d}: {p}") : "From {d}: {p}").replace("{d}", d).replace("{p}", "\u20b9" + mrp);
+  };
   function applyPlans(list) {
-    lastPlans = list;
+    lastPlans = list; window.payalPlans = list;
+    try { document.dispatchEvent(new Event("payal:plans")); } catch (e) {}
     var offerOn = !!(C.offerEnds && Date.parse(C.offerEnds) > Date.now());
     (list || []).forEach(function (p) {
       var rupee = "\u20b9" + p.price;
+      var aft = offerOn && p.mrp > p.price ? window.payalAfterText(p.mrp) : "";
       $$('[data-p="' + p.id + '"]').forEach(function (e) { e.textContent = rupee; });
-      $$('[data-after="' + p.id + '"]').forEach(function (e) { e.textContent = ""; e.style.display = "none"; });
+      $$('[data-after="' + p.id + '"]').forEach(function (e) { e.textContent = aft; e.style.display = aft ? "" : "none"; });
       var el = $("#plan-" + p.id); if (!el) return;
       var now = $(".now", el), mrp = $(".mrp", el), save = $(".save", el), off = $(".offer", el);
       if (now) now.textContent = p.price === 0 ? "\u20b90" : rupee;
       if (mrp) mrp.style.display = "none";
-      if (save) save.style.display = "none";
+      if (save) { save.textContent = aft; save.style.display = aft ? "" : "none"; }
       if (off && !off.classList.contains("static")) {
-        if (offerOn && p.price > 0 && p.mrp > p.price) { off.textContent = PT(C.offerName || "Kartik Purnima ki Shubhkamnayein"); off.style.display = ""; }
+        if (offerOn && p.price > 0 && p.mrp > p.price) { off.textContent = PT(C.offerName || "Winter Offer"); off.style.display = ""; }
         else { off.textContent = ""; off.style.display = "none"; }
       }
     });
@@ -221,7 +230,9 @@
     var l = window.PAYAL_LANG || "en", loc = (l === "hi" ? "hi-IN" : l === "bn" ? "bn-IN" : "en-IN") + "-u-nu-latn";
     var d = new Date(end).toLocaleDateString(loc, { day: "numeric", month: "short", timeZone: "Asia/Kolkata" });
     var tm = new Date(end).toLocaleTimeString(loc, { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).toLowerCase();
-    af.textContent = (window.PT ? PT("Ends {d}, {t}") : "Ends {d}, {t}").replace("{d}", d).replace("{t}", tm);
+    var pro = (lastPlansOf() || []).filter(function (x) { return x.id === "pro"; })[0];
+    var t2 = pro && pro.mrp > pro.price && window.payalAfterText ? window.payalAfterText(pro.mrp) : "";
+    af.textContent = t2 || (window.PT ? PT("Ends {d}, {t}") : "Ends {d}, {t}").replace("{d}", d).replace("{t}", tm);
   }
   function tick() {
     var t = end - Date.now();
@@ -230,7 +241,8 @@
     cd.textContent = (d > 0 ? d + "d " : "") + p(h) + ":" + p(m) + ":" + p(x);
     return true;
   }
-  after(); document.addEventListener("payal:lang", after);
+  function lastPlansOf() { return window.payalPlans || C.plans; }
+  after(); document.addEventListener("payal:lang", after); document.addEventListener("payal:plans", after);
   bar.hidden = false;
   if (tick()) { var iv = setInterval(function () { if (!tick()) clearInterval(iv); }, 1000); }
   bar.querySelector(".obar-x").addEventListener("click", function () {

@@ -41,7 +41,7 @@
     lastR = [st, user];
     var tier = st.tier || "free";
     $("#tier").textContent = tier === "pro" ? "Pro" : tier === "plus" ? "Plus" : "Free";
-    $("#texp").textContent = tier === "free" ? "" : hl("Active until " + dtl(st.expires_at), "चालू है: " + dtl(st.expires_at) + " तक", "চালু আছে: " + dtl(st.expires_at) + " পর্যন্ত");
+    $("#texp").textContent = tier === "free" ? "" : (Date.parse(st.expires_at) > Date.parse("2100-01-01") ? hl("Active for life", "हमेशा के लिए चालू", "সারাজীবনের জন্য চালু") : hl("Active until " + dtl(st.expires_at), "चालू है: " + dtl(st.expires_at) + " तक", "চালু আছে: " + dtl(st.expires_at) + " পর্যন্ত"));
     if (tier === "free") {
       $("#free").textContent = hl("No limit", "कोई सीमा नहीं", "কোনো সীমা নেই");
     } else {

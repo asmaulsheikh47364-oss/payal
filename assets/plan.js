@@ -39,7 +39,7 @@
   function planInfo() {
     var fb = null;
     (C.plans || []).forEach(function (x) { if (x.id === plan) fb = x; });
-    return fb || { id: plan, price: plan === "pro" ? 99 : 49, mrp: plan === "pro" ? 399 : 199, offerHi: "", offerEn: "" };
+    return fb || { id: plan, price: plan === "pro" ? 199 : 99, mrp: plan === "pro" ? 999 : 599, offerHi: "", offerEn: "" };
   }
   info = planInfo();
   function loadInfo() {
@@ -53,7 +53,7 @@
 
   function offerName() {
     /* one offer name everywhere on the site: the festival name from config.js */
-    var n = C.offerName || "Kartik Purnima ki Shubhkamnayein";
+    var n = C.offerName || "Winter Offer";
     return window.PT ? window.PT(n) : n;
   }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
@@ -75,8 +75,10 @@
     card.appendChild(el("h3", "", "Payal " + PN));
     var price = el("div", "price");
     price.appendChild(el("span", "now", "₹" + info.price));
-    price.appendChild(el("span", "per", L3("/ 30 days", "/ 30 दिन", "/ ৩০ দিন")));
+    price.appendChild(el("span", "per", L3("one time · lifetime", "एक बार · हमेशा के लिए", "একবার · সারাজীবনের জন্য")));
     card.appendChild(price);
+    var aftTxt = on && info.mrp > info.price && window.payalAfterText ? window.payalAfterText(info.mrp) : "";
+    if (aftTxt) card.appendChild(el("div", "save", aftTxt));
     if (on) {
       var cd = el("div", "plan-cd"); cd.appendChild(el("small", "", L3("Offer ends in", "ऑफ़र ख़त्म होने में", "অফার শেষ হতে")));
       var b = el("b", "cdh"); b.setAttribute("data-cd", "hms"); b.setAttribute("data-noi18n", ""); b.textContent = "--:--:--"; cd.appendChild(b); card.appendChild(cd);
@@ -97,13 +99,14 @@
     btn.addEventListener("click", buy);
     card.appendChild(btn);
     var st = el("div", "pstat"); st.id = "pstat"; st.setAttribute("aria-live", "polite"); st.hidden = true; card.appendChild(st);
-    if (tier === plan && !paidNow && !checking) {
+    if ((tier === plan || (plan === "plus" && tier === "pro")) && !paidNow && !checking) {
+      btn.hidden = true;
       st.hidden = false; st.className = "pstat info";
-      st.textContent = L3("You already have " + PN + ". If you buy it again before it ends, the new days are added after your current end date.", "आपके पास " + PN + " पहले से है। ख़त्म होने से पहले फिर खरीदेंगे तो नए दिन अभी वाली आख़िरी तारीख़ के बाद जुड़ जाएँगे।", "আপনার " + PN + " আগেই আছে। শেষ হওয়ার আগে আবার কিনলে নতুন দিনগুলো এখনকার শেষ তারিখের পরে যোগ হবে।");
+      st.textContent = L3("You already have " + (tier === "pro" ? "Pro" : PN) + " for life. There is nothing more to buy.", "आपके पास " + (tier === "pro" ? "Pro" : PN) + " हमेशा के लिए है। और कुछ ख़रीदने की ज़रूरत नहीं।", "আপনার " + (tier === "pro" ? "Pro" : PN) + " সারাজীবনের জন্য আছে। আর কিছু কেনার দরকার নেই।");
       var ca = el("a", "plink", L3("Contact us", "संपर्क कीजिए", "যোগাযোগ করুন")); ca.href = "contact.html";
       st.appendChild(document.createElement("br")); st.appendChild(ca);
     }
-    card.appendChild(el("p", "pnote", L3("30 days, never renews by itself. One Gmail, one phone.", "30 दिन चलता है, अपने-आप दोबारा नहीं कटता। एक Gmail, एक फ़ोन।", "৩০ দিন চলে, নিজে থেকে আর কাটে না। এক Gmail, এক ফোন।")));
+    card.appendChild(el("p", "pnote", L3("Pay once, yours for life. Nothing is ever charged again. One Gmail, one phone.", "एक बार दीजिए, हमेशा आपका। फिर कभी कुछ नहीं कटता। एक Gmail, एक फ़ोन।", "একবার দিন, সারাজীবন আপনার। আর কখনো কিছু কাটা হয় না। এক Gmail, এক ফোন।")));
     var bn = banner();
     if (bn) box.appendChild(bn);
     box.appendChild(card);
@@ -239,7 +242,7 @@
             try { var curExp = current && current.expires_at ? Date.parse(current.expires_at) : NaN;
             sessionStorage.setItem("payal_prev_exp_" + plan, !isNaN(curExp) && curExp > Date.now() && (current.tier === plan || (plan === "plus" && current.tier === "pro")) ? String(current.expires_at) : ""); } catch (e) {}
             var rz = new window.Razorpay({
-              key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + " - 30 days",
+              key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + " - lifetime",
               order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#f0ac2e" },
               modal: { ondismiss: function () { stat("info", L3("Payment window closed. Tap Buy when you are ready.", "पेमेंट की विंडो बंद हो गई। तैयार हों तो फिर Buy दबाइए।", "পেমেন্ট উইন্ডো বন্ধ হয়েছে। তৈরি হলে আবার Buy চাপুন।")); } },
               handler: function (resp) {

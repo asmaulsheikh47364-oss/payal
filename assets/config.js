@@ -11,15 +11,16 @@ window.PAYAL = {
   email: "asmaulsheikh47364@gmail.com",
   paymentsLive: false,
   /* Offer countdown: change this date to end the offer sooner or later. Empty string hides every countdown.
-     The site shows only when the offer ends, never a "price after the offer" (mrp is not shown as a future price). */
-  offerName: "Kartik Purnima ki Shubhkamnayein",
-  offerEnds: "2026-11-24T23:59:59+05:30",
+     When the offer ends, the server itself switches the price to mrp at the same moment (cron job "payal-offer-end"),
+     so the "From <date>: <mrp>" line on the site is a real, fixed fact. Keep this date and the server job the same. */
+  offerName: "Winter Offer",
+  offerEnds: "2026-11-30T23:59:59+05:30",
   supabaseUrl: "https://hwfifqyssabwwdjlbqty.supabase.co",
   supabaseAnonKey: "sb_publishable_p_qIHrnCIUqRK7l-rkDhRw_r-O0yIWW",
   plans: [
     { id: "free", price: 0, mrp: 0, offerHi: "", offerEn: "" },
-    { id: "plus", price: 49, mrp: 199, offerHi: "", offerEn: "" },
-    { id: "pro", price: 99, mrp: 399, offerHi: "", offerEn: "" }
+    { id: "plus", price: 99, mrp: 599, offerHi: "", offerEn: "" },
+    { id: "pro", price: 199, mrp: 999, offerHi: "", offerEn: "" }
   ]
 };
 
