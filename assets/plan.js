@@ -99,12 +99,18 @@
     btn.addEventListener("click", buy);
     card.appendChild(btn);
     var st = el("div", "pstat"); st.id = "pstat"; st.setAttribute("aria-live", "polite"); st.hidden = true; card.appendChild(st);
-    if (tier === "pro" && !paidNow && !checking) {
+    var proLife = tier === "pro" && current && current.expires_at && Date.parse(current.expires_at) > Date.parse("2100-01-01");
+    if (proLife && !paidNow && !checking) {
       btn.hidden = true;
       st.hidden = false; st.className = "pstat info";
       st.textContent = L3("You already have Pro for life. There is nothing more to buy.", "आपके पास Pro हमेशा के लिए है। और कुछ ख़रीदने की ज़रूरत नहीं।", "আপনার Pro সারাজীবনের জন্য আছে। আর কিছু কেনার দরকার নেই।");
       var ca0 = el("a", "plink", L3("Contact us", "संपर्क कीजिए", "যোগাযোগ করুন")); ca0.href = "contact.html";
       st.appendChild(document.createElement("br")); st.appendChild(ca0);
+    } else if (tier === "pro" && plan === "pro" && !paidNow && !checking) {
+      var dt = current && current.expires_at ? new Date(current.expires_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }) : "";
+      st.hidden = false; st.className = "pstat info";
+      if (!dt) { btn.hidden = true; st.textContent = L3("You already have Pro.", "आपके पास Pro पहले से है।", "আপনার Pro আগেই আছে।"); } else
+      st.textContent = L3("Your current Pro runs until " + dt + ". Buy Pro now and it becomes yours for life.", "आपका अभी वाला Pro " + dt + " तक चलेगा। अभी Pro ख़रीदेंगे तो वह हमेशा के लिए आपका हो जाएगा।", "আপনার এখনকার Pro " + dt + " পর্যন্ত চলবে। এখন Pro কিনলে তা সারাজীবনের জন্য আপনার হয়ে যাবে।");
     } else if (tier === plan && !paidNow && !checking) {
       st.hidden = false; st.className = "pstat info";
       st.textContent = L3("You already have " + PN + ". If you buy it again before it ends, the new days are added after your current end date.", "आपके पास " + PN + " पहले से है। ख़त्म होने से पहले फिर खरीदेंगे तो नए दिन अभी वाली आख़िरी तारीख़ के बाद जुड़ जाएँगे।", "আপনার " + PN + " আগেই আছে। শেষ হওয়ার আগে আবার কিনলে নতুন দিনগুলো এখনকার শেষ তারিখের পরে যোগ হবে।");
