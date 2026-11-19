@@ -75,7 +75,7 @@
     card.appendChild(el("h3", "", "Payal " + PN));
     var price = el("div", "price");
     price.appendChild(el("span", "now", "₹" + info.price));
-    price.appendChild(el("span", "per", L3("one time · lifetime", "एक बार · हमेशा के लिए", "একবার · সারাজীবনের জন্য")));
+    price.appendChild(el("span", "per", plan === "pro" ? L3("one time · lifetime", "एक बार · हमेशा के लिए", "একবার · সারাজীবনের জন্য") : L3("/ 30 days", "/ 30 दिन", "/ ৩০ দিন")));
     card.appendChild(price);
     var aftTxt = on && info.mrp > info.price && window.payalAfterText ? window.payalAfterText(info.mrp) : "";
     if (aftTxt) card.appendChild(el("div", "save", aftTxt));
@@ -99,14 +99,19 @@
     btn.addEventListener("click", buy);
     card.appendChild(btn);
     var st = el("div", "pstat"); st.id = "pstat"; st.setAttribute("aria-live", "polite"); st.hidden = true; card.appendChild(st);
-    if ((tier === plan || (plan === "plus" && tier === "pro")) && !paidNow && !checking) {
+    if (tier === "pro" && !paidNow && !checking) {
       btn.hidden = true;
       st.hidden = false; st.className = "pstat info";
-      st.textContent = L3("You already have " + (tier === "pro" ? "Pro" : PN) + " for life. There is nothing more to buy.", "आपके पास " + (tier === "pro" ? "Pro" : PN) + " हमेशा के लिए है। और कुछ ख़रीदने की ज़रूरत नहीं।", "আপনার " + (tier === "pro" ? "Pro" : PN) + " সারাজীবনের জন্য আছে। আর কিছু কেনার দরকার নেই।");
+      st.textContent = L3("You already have Pro for life. There is nothing more to buy.", "आपके पास Pro हमेशा के लिए है। और कुछ ख़रीदने की ज़रूरत नहीं।", "আপনার Pro সারাজীবনের জন্য আছে। আর কিছু কেনার দরকার নেই।");
+      var ca0 = el("a", "plink", L3("Contact us", "संपर्क कीजिए", "যোগাযোগ করুন")); ca0.href = "contact.html";
+      st.appendChild(document.createElement("br")); st.appendChild(ca0);
+    } else if (tier === plan && !paidNow && !checking) {
+      st.hidden = false; st.className = "pstat info";
+      st.textContent = L3("You already have " + PN + ". If you buy it again before it ends, the new days are added after your current end date.", "आपके पास " + PN + " पहले से है। ख़त्म होने से पहले फिर खरीदेंगे तो नए दिन अभी वाली आख़िरी तारीख़ के बाद जुड़ जाएँगे।", "আপনার " + PN + " আগেই আছে। শেষ হওয়ার আগে আবার কিনলে নতুন দিনগুলো এখনকার শেষ তারিখের পরে যোগ হবে।");
       var ca = el("a", "plink", L3("Contact us", "संपर्क कीजिए", "যোগাযোগ করুন")); ca.href = "contact.html";
       st.appendChild(document.createElement("br")); st.appendChild(ca);
     }
-    card.appendChild(el("p", "pnote", L3("Pay once, yours for life. Nothing is ever charged again. One Gmail, one phone.", "एक बार दीजिए, हमेशा आपका। फिर कभी कुछ नहीं कटता। एक Gmail, एक फ़ोन।", "একবার দিন, সারাজীবন আপনার। আর কখনো কিছু কাটা হয় না। এক Gmail, এক ফোন।")));
+    card.appendChild(el("p", "pnote", (plan === "pro" ? L3("Pay once, yours for life. Nothing is ever charged again. One Gmail, one phone.", "एक बार दीजिए, हमेशा आपका। फिर कभी कुछ नहीं कटता। एक Gmail, एक फ़ोन।", "একবার দিন, সারাজীবন আপনার। আর কখনো কিছু কাটা হয় না। এক Gmail, এক ফোন।") : L3("30 days, never renews by itself. One Gmail, one phone.", "30 दिन चलता है, अपने-आप दोबारा नहीं कटता। एक Gmail, एक फ़ोन।", "৩০ দিন চলে, নিজে থেকে আর কাটে না। এক Gmail, এক ফোন।"))));
     var bn = banner();
     if (bn) box.appendChild(bn);
     box.appendChild(card);
@@ -242,7 +247,7 @@
             try { var curExp = current && current.expires_at ? Date.parse(current.expires_at) : NaN;
             sessionStorage.setItem("payal_prev_exp_" + plan, !isNaN(curExp) && curExp > Date.now() && (current.tier === plan || (plan === "plus" && current.tier === "pro")) ? String(current.expires_at) : ""); } catch (e) {}
             var rz = new window.Razorpay({
-              key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + " - lifetime",
+              key: o.key_id, amount: o.amount, currency: "INR", name: "Payal", description: PN + (plan === "pro" ? " - lifetime" : " - 30 days"),
               order_id: o.order_id, prefill: { email: o.email }, theme: { color: "#f0ac2e" },
               modal: { ondismiss: function () { stat("info", L3("Payment window closed. Tap Buy when you are ready.", "पेमेंट की विंडो बंद हो गई। तैयार हों तो फिर Buy दबाइए।", "পেমেন্ট উইন্ডো বন্ধ হয়েছে। তৈরি হলে আবার Buy চাপুন।")); } },
               handler: function (resp) {

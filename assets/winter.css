@@ -191,3 +191,4 @@ html:after{right:-30px;transform:scaleX(-1)}
 .hstep{border:1px solid var(--line)!important;background:rgba(255,255,255,.75)!important}
 .hstep b.n{background:linear-gradient(135deg,#7cc8f7,#1e78d6)!important;color:#fff!important}
 .note{border-left-color:#1e78d6!important;background:rgba(30,120,214,.07)!important}
+.obar-btn .shtxt{--c1:#0b2547;--c2:#3e7fbf}[data-apk] .shtxt,.btn.primary .shtxt{--c1:#ffffff;--c2:#bfe6ff}
