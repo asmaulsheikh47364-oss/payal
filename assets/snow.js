@@ -31,9 +31,10 @@
   var N = Math.min(48, Math.round(W * H / 15000));
   for (var i = 0; i < N; i++) flakes.push(make(false));
   window.addEventListener("resize", size);
-  document.addEventListener("visibilitychange", function () { run = !document.hidden; if (run) requestAnimationFrame(tick); });
+  var looping = false;
+  document.addEventListener("visibilitychange", function () { run = !document.hidden; if (run && !looping) { looping = true; requestAnimationFrame(tick); } });
   function tick(now) {
-    if (!run) return;
+    if (!run) { looping = false; return; }
     requestAnimationFrame(tick);
     if (now - last < 33) return;
     last = now;
@@ -45,5 +46,6 @@
       g.drawImage(sp, f.x - sp.width / 2, f.y - sp.height / 2);
     }
   }
+  looping = true;
   requestAnimationFrame(tick);
 })();

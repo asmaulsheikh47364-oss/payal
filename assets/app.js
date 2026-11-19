@@ -88,6 +88,8 @@
     try { document.dispatchEvent(new Event("payal:plans")); } catch (e) {}
     var offerOn = !!(C.offerEnds && Date.parse(C.offerEnds) > Date.now());
     (list || []).forEach(function (p) {
+      /* if the server could not be asked and the offer is over, the real price is mrp (the server switches at the same moment) */
+      if (!offerOn && list === C.plans && p.mrp > p.price) p = { id: p.id, price: p.mrp, mrp: p.mrp, offerHi: "", offerEn: "" };
       var rupee = "\u20b9" + p.price;
       var aft = offerOn && p.mrp > p.price ? window.payalAfterText(p.mrp) : "";
       $$('[data-p="' + p.id + '"]').forEach(function (e) { e.textContent = rupee; });

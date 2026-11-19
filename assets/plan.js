@@ -39,7 +39,9 @@
   function planInfo() {
     var fb = null;
     (C.plans || []).forEach(function (x) { if (x.id === plan) fb = x; });
-    return fb || { id: plan, price: plan === "pro" ? 199 : 99, mrp: plan === "pro" ? 999 : 599, offerHi: "", offerEn: "" };
+    var r = fb || { id: plan, price: plan === "pro" ? 199 : 99, mrp: plan === "pro" ? 999 : 599, offerHi: "", offerEn: "" };
+    var over = !(C.offerEnds && Date.parse(C.offerEnds) > Date.now());
+    return over && r.mrp > r.price ? { id: r.id, price: r.mrp, mrp: r.mrp, offerHi: "", offerEn: "" } : r;
   }
   info = planInfo();
   function loadInfo() {
@@ -106,8 +108,14 @@
       st.textContent = L3("You already have Pro for life. There is nothing more to buy.", "आपके पास Pro हमेशा के लिए है। और कुछ ख़रीदने की ज़रूरत नहीं।", "আপনার Pro সারাজীবনের জন্য আছে। আর কিছু কেনার দরকার নেই।");
       var ca0 = el("a", "plink", L3("Contact us", "संपर्क कीजिए", "যোগাযোগ করুন")); ca0.href = "contact.html";
       st.appendChild(document.createElement("br")); st.appendChild(ca0);
+    } else if (tier === "pro" && plan === "plus" && !paidNow && !checking) {
+      btn.hidden = true;
+      st.hidden = false; st.className = "pstat info";
+      st.textContent = L3("You already have Pro, which includes everything in Plus.", "आपके पास पहले से Pro है, जिसमें Plus का सब कुछ है।", "আপনার Pro আগেই আছে, যাতে Plus-এর সবকিছু আছে।");
     } else if (tier === "pro" && plan === "pro" && !paidNow && !checking) {
-      var dt = current && current.expires_at ? new Date(current.expires_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }) : "";
+      var ex = current && current.expires_at ? Date.parse(current.expires_at) : NaN;
+      var lc = (window.PAYAL_LANG === "hi" ? "hi-IN" : window.PAYAL_LANG === "bn" ? "bn-IN" : "en-IN") + "-u-nu-latn";
+      var dt = !isNaN(ex) && ex > Date.now() ? new Date(ex).toLocaleDateString(lc, { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" }) : "";
       st.hidden = false; st.className = "pstat info";
       if (!dt) { btn.hidden = true; st.textContent = L3("You already have Pro.", "आपके पास Pro पहले से है।", "আপনার Pro আগেই আছে।"); } else
       st.textContent = L3("Your current Pro runs until " + dt + ". Buy Pro now and it becomes yours for life.", "आपका अभी वाला Pro " + dt + " तक चलेगा। अभी Pro ख़रीदेंगे तो वह हमेशा के लिए आपका हो जाएगा।", "আপনার এখনকার Pro " + dt + " পর্যন্ত চলবে। এখন Pro কিনলে তা সারাজীবনের জন্য আপনার হয়ে যাবে।");
