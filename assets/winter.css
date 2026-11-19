@@ -8,7 +8,7 @@
   --ice:#7cc8f7;--navy:#0f2340;
 }
 html{color-scheme:light;background:
- linear-gradient(180deg,#eef5fd 0%,#e3eefb 55%,#d6e7f8 100%) #e9f2fc}
+ linear-gradient(180deg,#e2eefb 0%,#d2e4f7 55%,#c3daf2 100%) #d6e7f8}
 /* body is its own layer above the corner trees, so the trees always stay behind every card and line of text */
 body{background:transparent!important;color:var(--text);position:relative;z-index:1}
 body:before{display:none!important}
