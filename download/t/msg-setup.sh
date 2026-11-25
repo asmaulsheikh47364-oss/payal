@@ -50,6 +50,9 @@ create table if not exists public.msg_msg (
 create index if not exists msg_msg_pair on public.msg_msg (receiver, sender, id);
 create index if not exists msg_msg_pair2 on public.msg_msg (sender, receiver, id);
 alter table public.msg_msg enable row level security;
+alter table public.msg_msg add column if not exists delivered boolean not null default false;
+alter table public.msg_profile add column if not exists typing_to uuid;
+alter table public.msg_profile add column if not exists typing_at timestamptz;
 
 -- daily limits (shares cm_limit / cm_hit from the community setup; created here too if missing)
 create table if not exists public.cm_limit (uid uuid not null, what text not null, day date not null, cnt int not null, primary key (uid, what));
@@ -180,6 +183,7 @@ declare me uuid := auth.uid(); req json; fr json;
 begin
   if me is null then return json_build_object('error', 'login'); end if;
   update msg_profile set seen = now() where uid = me;
+  update msg_msg set delivered = true where receiver = me and not delivered;
   select coalesce(json_agg(msg_card(p) order by f.at desc), '[]'::json) into req
     from msg_friend f join msg_profile p on p.uid = f.asked_by
     where f.state = 'pending' and f.asked_by <> me and (f.a = me or f.b = me) and not msg_blocked(me, p.uid);
@@ -187,6 +191,9 @@ begin
     select p.code, p.name, p.bio, p.pub,
       (select max(m.id) from msg_msg m where (m.sender = me and m.receiver = p.uid) or (m.sender = p.uid and m.receiver = me)) as last_id,
       (select m.at from msg_msg m where (m.sender = me and m.receiver = p.uid) or (m.sender = p.uid and m.receiver = me) order by m.id desc limit 1) as last_at,
+      (select json_build_object('body', m.body, 'nonce', m.nonce, 'mine', m.sender = me, 'seen', m.seen, 'delivered', m.delivered) from msg_msg m
+         where (m.sender = me and m.receiver = p.uid) or (m.sender = p.uid and m.receiver = me) order by m.id desc limit 1) as last,
+      (p.typing_to = me and p.typing_at > now() - interval '6 seconds') as typing,
       (select count(*) from msg_msg m where m.sender = p.uid and m.receiver = me and not m.seen) as unread,
       (p.seen > now() - interval '3 minutes') as online
     from msg_friend f join msg_profile p on p.uid = (case when f.a = me then f.b else f.a end)
@@ -211,7 +218,7 @@ end $$;
 -- Messages between me and one friend after a message number; the ones sent to me are marked seen.
 create or replace function public.msg_poll(p_code text, p_after bigint)
 returns json language plpgsql security definer set search_path = public, pg_temp as $$
-declare me uuid := auth.uid(); o uuid; res json; their_seen bigint;
+declare me uuid := auth.uid(); o uuid; res json; their_seen bigint; their_got bigint;
 begin
   select uid into o from msg_profile where upper(code) = upper(msg_txt(p_code, 20));
   if me is null or o is null then return json_build_object('error', 'nobody'); end if;
@@ -219,11 +226,24 @@ begin
   select coalesce(json_agg(json_build_object('id', m.id, 'at', m.at, 'mine', m.sender = me, 'body', m.body, 'nonce', m.nonce) order by m.id), '[]'::json) into res
     from (select * from msg_msg m where ((m.sender = me and m.receiver = o) or (m.sender = o and m.receiver = me)) and m.id > coalesce(p_after, 0)
           order by m.id desc limit 200) m;
-  update msg_msg set seen = true where sender = o and receiver = me and not seen;
+  update msg_msg set seen = true, delivered = true where sender = o and receiver = me and not seen;
   select coalesce(max(id), 0) into their_seen from msg_msg where sender = me and receiver = o and seen;
+  select coalesce(max(id), 0) into their_got from msg_msg where sender = me and receiver = o and delivered;
   update msg_profile set seen = now() where uid = me;
-  return json_build_object('items', res, 'seen_upto', their_seen,
-    'online', (select p.seen > now() - interval '3 minutes' from msg_profile p where p.uid = o));
+  return json_build_object('items', res, 'seen_upto', their_seen, 'delivered_upto', their_got,
+    'online', (select p.seen > now() - interval '3 minutes' from msg_profile p where p.uid = o),
+    'typing', (select p.typing_to = me and p.typing_at > now() - interval '6 seconds' from msg_profile p where p.uid = o));
+end $$;
+
+-- "is typing..." for 6 seconds
+create or replace function public.msg_typing(p_code text)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); o uuid;
+begin
+  select uid into o from msg_profile where upper(code) = upper(msg_txt(p_code, 20));
+  if me is null or o is null then return json_build_object('error', 'nobody'); end if;
+  update msg_profile set typing_to = o, typing_at = now() where uid = me;
+  return json_build_object('ok', true);
 end $$;
 
 create or replace function public.msg_block_user(p_code text)
@@ -256,7 +276,7 @@ end $$;
 
 do $$ declare f text; begin
   foreach f in array array['msg_register(text,text,boolean,text)','msg_me()','msg_set_hidden(boolean)','msg_find(text)','msg_request(text)',
-    'msg_answer(text,boolean)','msg_home()','msg_send(text,text,text)','msg_poll(text,bigint)','msg_block_user(text)','msg_report_user(text,text)'] loop
+    'msg_answer(text,boolean)','msg_home()','msg_typing(text)','msg_send(text,text,text)','msg_poll(text,bigint)','msg_block_user(text)','msg_report_user(text,text)'] loop
     execute 'revoke all on function public.' || f || ' from public, anon';
     execute 'grant execute on function public.' || f || ' to authenticated';
   end loop;
