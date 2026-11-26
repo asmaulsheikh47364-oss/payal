@@ -23,6 +23,23 @@ do $$ begin
   end if;
 end $$;
 
+alter table public.msg_story add column if not exists music text not null default '';
+
+-- stories are no longer bulk-deleted here; each owner's app removes its old stories with their files (msg_old_files)
+create or replace function public.msg_story_add(p_kind text, p_url text, p_text text, p_bg text)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); nid bigint;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  if not exists (select 1 from msg_profile where uid = me) then return json_build_object('error', 'join'); end if;
+  if p_kind not in ('photo', 'text') then return json_build_object('error', 'kind'); end if;
+  if p_kind = 'photo' and (coalesce(p_url, '') = '' or not msg_okurl(p_url, me)) then return json_build_object('error', 'url'); end if;
+  if p_kind = 'text' and length(msg_txt(p_text, 300)) = 0 then return json_build_object('error', 'text'); end if;
+  if not cm_hit(me, 'msg_story', 25) then return json_build_object('error', 'limit'); end if;
+  insert into msg_story (uid, kind, url, txt, bg) values (me, p_kind, coalesce(p_url, ''), msg_txt(p_text, 300), left(coalesce(p_bg, ''), 12)) returning id into nid;
+  return json_build_object('ok', true, 'id', nid);
+end $$;
+
 create table if not exists public.msg_story_report (story bigint not null, reporter uuid not null, at timestamptz not null default now(), primary key (story, reporter));
 alter table public.msg_story_report enable row level security;
 
@@ -93,7 +110,9 @@ returns json language plpgsql security definer set search_path = public, pg_temp
 declare me uuid := auth.uid();
 begin
   if me is null then return json_build_object('error', 'login'); end if;
-  if not exists (select 1 from msg_story where id = p_id and uid <> me) then return json_build_object('error', 'story'); end if;
+  if not exists (select 1 from msg_story s where s.id = p_id and s.uid <> me
+      and exists (select 1 from msg_friend f where f.a = least(me, s.uid) and f.b = greatest(me, s.uid) and f.state = 'ok')) then
+    return json_build_object('error', 'story'); end if;
   if not cm_hit(me, 'msg_story_report', 30) then return json_build_object('error', 'limit'); end if;
   insert into msg_story_report (story, reporter) values (p_id, me) on conflict do nothing;
   return json_build_object('ok', true);
