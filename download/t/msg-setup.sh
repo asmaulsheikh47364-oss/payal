@@ -281,6 +281,196 @@ do $$ declare f text; begin
     execute 'grant execute on function public.' || f || ' to authenticated';
   end loop;
 end $$;
+
+-- ===================== part 1b (2026-11-26): profile photo, People You May Know, Stories =====================
+alter table public.msg_profile add column if not exists photo text not null default '';
+
+-- photo store: public bucket, every user writes only inside a folder named with their own id; no listing
+do $$ begin
+  if exists (select 1 from information_schema.schemata where schema_name = 'storage') then
+    insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+      values ('pchat', 'pchat', true, 1572864, array['image/jpeg'])
+      on conflict (id) do update set public = true, file_size_limit = 1572864, allowed_mime_types = array['image/jpeg'];
+    drop policy if exists pchat_insert on storage.objects;
+    create policy pchat_insert on storage.objects for insert to authenticated
+      with check (bucket_id = 'pchat' and (storage.foldername(name))[1] = auth.uid()::text);
+    drop policy if exists pchat_delete on storage.objects;
+    create policy pchat_delete on storage.objects for delete to authenticated
+      using (bucket_id = 'pchat' and (storage.foldername(name))[1] = auth.uid()::text);
+  end if;
+end $$;
+
+create or replace function public.msg_okurl(p_url text, p_uid uuid)
+returns boolean language sql immutable set search_path = public, pg_temp as $$
+  select coalesce(p_url, '') = '' or p_url like 'https://hwfifqyssabwwdjlbqty.supabase.co/storage/v1/object/public/pchat/' || p_uid::text || '/%'
+$$;
+revoke all on function public.msg_okurl(text, uuid) from public, anon, authenticated;
+
+create or replace function public.msg_card(p public.msg_profile)
+returns json language sql stable set search_path = public, pg_temp as $$
+  select json_build_object('code', p.code, 'name', p.name, 'bio', p.bio, 'photo', p.photo)
+$$;
+revoke all on function public.msg_card(public.msg_profile) from public, anon, authenticated;
+
+create or replace function public.msg_me()
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); p msg_profile;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  select * into p from msg_profile where uid = me;
+  if not found then return json_build_object('joined', false, 'code', upper(coalesce((public.ref_my())::jsonb ->> 'code', ''))); end if;
+  update msg_profile set seen = now() where uid = me;
+  return json_build_object('joined', true, 'uid', me, 'code', p.code, 'name', p.name, 'bio', p.bio, 'photo', p.photo, 'hidden', p.hidden, 'has_pub', p.pub <> '');
+end $$;
+
+create or replace function public.msg_set_photo(p_url text)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid();
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  if not msg_okurl(p_url, me) then return json_build_object('error', 'url'); end if;
+  update msg_profile set photo = coalesce(p_url, '') where uid = me;
+  return json_build_object('ok', true);
+end $$;
+
+-- friends list for the chat home now also carries the photo
+create or replace function public.msg_home()
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); req json; fr json;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  update msg_profile set seen = now() where uid = me;
+  update msg_msg set delivered = true where receiver = me and not delivered;
+  select coalesce(json_agg(msg_card(p) order by f.at desc), '[]'::json) into req
+    from msg_friend f join msg_profile p on p.uid = f.asked_by
+    where f.state = 'pending' and f.asked_by <> me and (f.a = me or f.b = me) and not msg_blocked(me, p.uid);
+  select coalesce(json_agg(x order by x.last_id desc nulls last, x.name), '[]'::json) into fr from (
+    select p.code, p.name, p.bio, p.pub, p.photo,
+      (select max(m.id) from msg_msg m where (m.sender = me and m.receiver = p.uid) or (m.sender = p.uid and m.receiver = me)) as last_id,
+      (select m.at from msg_msg m where (m.sender = me and m.receiver = p.uid) or (m.sender = p.uid and m.receiver = me) order by m.id desc limit 1) as last_at,
+      (select json_build_object('body', m.body, 'nonce', m.nonce, 'mine', m.sender = me, 'seen', m.seen, 'delivered', m.delivered) from msg_msg m
+         where (m.sender = me and m.receiver = p.uid) or (m.sender = p.uid and m.receiver = me) order by m.id desc limit 1) as last,
+      (p.typing_to = me and p.typing_at > now() - interval '6 seconds') as typing,
+      (select count(*) from msg_msg m where m.sender = p.uid and m.receiver = me and not m.seen) as unread,
+      (p.seen > now() - interval '3 minutes') as online
+    from msg_friend f join msg_profile p on p.uid = (case when f.a = me then f.b else f.a end)
+    where f.state = 'ok' and (f.a = me or f.b = me) and not msg_blocked(me, p.uid)) x;
+  return json_build_object('requests', req, 'friends', fr);
+end $$;
+
+-- People You May Know: friends of my friends (not hidden, not already linked, not blocked), most mutual friends first
+create or replace function public.msg_people()
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); res json;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  with mine as (
+    select case when a = me then b else a end as f from msg_friend where state = 'ok' and (a = me or b = me)
+  ), fof as (
+    select case when x.a = m.f then x.b else x.a end as pid, count(*) as mutual
+    from msg_friend x join mine m on (x.a = m.f or x.b = m.f)
+    where x.state = 'ok' group by 1
+  )
+  select coalesce(json_agg(t.j order by t.mutual desc, t.seen desc), '[]'::json) into res from (
+    select json_build_object('card', msg_card(pr), 'mutual', fof.mutual, 'online', pr.seen > now() - interval '3 minutes') as j, fof.mutual, pr.seen
+    from fof join msg_profile pr on pr.uid = fof.pid
+    where fof.pid <> me and pr.adult and not pr.hidden and not msg_blocked(me, fof.pid)
+      and not exists (select 1 from msg_friend z where z.a = least(me, fof.pid) and z.b = greatest(me, fof.pid))
+    order by fof.mutual desc, pr.seen desc limit 50) t;
+  return json_build_object('items', res);
+end $$;
+
+create table if not exists public.msg_story (
+  id bigserial primary key,
+  uid uuid not null,
+  kind text not null,            -- 'photo' or 'text'
+  url text not null default '',
+  txt text not null default '',
+  bg text not null default '',
+  at timestamptz not null default now()
+);
+create index if not exists msg_story_uid on public.msg_story (uid, at);
+alter table public.msg_story enable row level security;
+create table if not exists public.msg_story_seen (story bigint not null, viewer uuid not null, at timestamptz not null default now(), primary key (story, viewer));
+alter table public.msg_story_seen enable row level security;
+
+create or replace function public.msg_story_add(p_kind text, p_url text, p_text text, p_bg text)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); nid bigint;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  if not exists (select 1 from msg_profile where uid = me) then return json_build_object('error', 'join'); end if;
+  if p_kind not in ('photo', 'text') then return json_build_object('error', 'kind'); end if;
+  if p_kind = 'photo' and (coalesce(p_url, '') = '' or not msg_okurl(p_url, me)) then return json_build_object('error', 'url'); end if;
+  if p_kind = 'text' and length(msg_txt(p_text, 300)) = 0 then return json_build_object('error', 'text'); end if;
+  if not cm_hit(me, 'msg_story', 25) then return json_build_object('error', 'limit'); end if;
+  insert into msg_story (uid, kind, url, txt, bg) values (me, p_kind, coalesce(p_url, ''), msg_txt(p_text, 300), left(coalesce(p_bg, ''), 12)) returning id into nid;
+  delete from msg_story_seen where story in (select id from msg_story where at < now() - interval '2 days');
+  delete from msg_story where at < now() - interval '2 days';
+  return json_build_object('ok', true, 'id', nid);
+end $$;
+
+-- my stories and my friends' stories from the last 24 hours, grouped by person
+create or replace function public.msg_stories()
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); res json;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  with people as (
+    select me as u union
+    select case when a = me then b else a end from msg_friend where state = 'ok' and (a = me or b = me)
+  ), st as (
+    select s.*, exists (select 1 from msg_story_seen v where v.story = s.id and v.viewer = me) as viewed,
+      (select count(*) from msg_story_seen v where v.story = s.id) as views
+    from msg_story s join people p on p.u = s.uid
+    where s.at > now() - interval '24 hours' and not msg_blocked(me, s.uid)
+  )
+  select coalesce(json_agg(g order by g.mine desc, g.all_viewed, g.last_at desc), '[]'::json) into res from (
+    select (st.uid = me) as mine, msg_card(p) as card, bool_and(st.viewed or st.uid = me) as all_viewed, max(st.at) as last_at,
+      json_agg(json_build_object('id', st.id, 'kind', st.kind, 'url', st.url, 'text', st.txt, 'bg', st.bg, 'at', st.at, 'viewed', st.viewed,
+        'views', case when st.uid = me then st.views else null end) order by st.id) as items
+    from st join msg_profile p on p.uid = st.uid
+    group by st.uid, p.uid) g;
+  return json_build_object('items', res);
+end $$;
+
+create or replace function public.msg_story_view(p_id bigint)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); o uuid;
+begin
+  select uid into o from msg_story where id = p_id;
+  if me is null or o is null then return json_build_object('error', 'nobody'); end if;
+  if o <> me and exists (select 1 from msg_friend where a = least(me, o) and b = greatest(me, o) and state = 'ok') then
+    insert into msg_story_seen (story, viewer) values (p_id, me) on conflict do nothing;
+  end if;
+  return json_build_object('ok', true);
+end $$;
+
+create or replace function public.msg_story_viewers(p_id bigint)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); res json;
+begin
+  if not exists (select 1 from msg_story where id = p_id and uid = me) then return json_build_object('error', 'nobody'); end if;
+  select coalesce(json_agg(json_build_object('card', msg_card(p), 'at', v.at) order by v.at desc), '[]'::json) into res
+    from msg_story_seen v join msg_profile p on p.uid = v.viewer where v.story = p_id;
+  return json_build_object('items', res);
+end $$;
+
+create or replace function public.msg_story_delete(p_id bigint)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  delete from msg_story_seen where story = p_id and exists (select 1 from msg_story where id = p_id and uid = auth.uid());
+  delete from msg_story where id = p_id and uid = auth.uid();
+  return json_build_object('ok', true);
+end $$;
+
+do $$ declare f text; begin
+  foreach f in array array['msg_me()','msg_home()','msg_set_photo(text)','msg_people()','msg_story_add(text,text,text,text)','msg_stories()',
+    'msg_story_view(bigint)','msg_story_viewers(bigint)','msg_story_delete(bigint)'] loop
+    execute 'revoke all on function public.' || f || ' from public, anon';
+    execute 'grant execute on function public.' || f || ' to authenticated';
+  end loop;
+end $$;
 SQLEOF
 echo "Supabase access token paste karo (sbp_ se shuru, dikhega nahi), phir Enter:"
 read -s TOK
@@ -300,4 +490,4 @@ def q(sql):
 print("DATABASE", q(open("msg.sql", encoding="utf-8").read())[0])
 print("CHECK", q("select proname from pg_proc where proname like 'msg_%' order by 1")[1])
 PY
-[ $? -eq 0 ] && echo "=== TAIYAR: Friends (baatcheet) ki jagah ban gayi ===" || echo "=== Kuch step fail hua, upar ka error bhejo ==="
+[ $? -eq 0 ] && echo "=== TAIYAR: Payal Chat (baatcheet, photo, stories) ki jagah ban gayi ===" || echo "=== Kuch step fail hua, upar ka error bhejo ==="
