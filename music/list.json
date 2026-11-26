@@ -1,0 +1,116 @@
+{
+ "tracks": [
+  {
+   "id": "t01",
+   "title": "Khushi ki Subah",
+   "mood": "Happy",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t02",
+   "title": "Dil ki Baat",
+   "mood": "Romantic",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t03",
+   "title": "Tanha Raat",
+   "mood": "Sad",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t04",
+   "title": "Josh",
+   "mood": "Energy",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t05",
+   "title": "Shaam e Yaman",
+   "mood": "Indian",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t06",
+   "title": "Sitar ki Dhun",
+   "mood": "Indian",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t07",
+   "title": "Bhairavi Sukoon",
+   "mood": "Peaceful",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t08",
+   "title": "Mela",
+   "mood": "Festive",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t09",
+   "title": "Lofi Chai",
+   "mood": "Chill",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t10",
+   "title": "Barish",
+   "mood": "Chill",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t11",
+   "title": "Pehla Pyaar",
+   "mood": "Romantic",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t12",
+   "title": "Safar",
+   "mood": "Travel",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t13",
+   "title": "Yaadein",
+   "mood": "Sad",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t14",
+   "title": "Dosti",
+   "mood": "Happy",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t15",
+   "title": "Sufi Sham",
+   "mood": "Peaceful",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  },
+  {
+   "id": "t16",
+   "title": "Dhamaka",
+   "mood": "Energy",
+   "credit": "Music: Payal Chat (original)",
+   "secs": 30
+  }
+ ]
+}
