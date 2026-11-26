@@ -512,6 +512,133 @@ end $$;
 
 revoke all on function public.msg_story_add2(text,text,text,text,text) from public, anon;
 grant execute on function public.msg_story_add2(text,text,text,text,text) to authenticated;
+
+-- ===================== part 1d (2026-11-26): others' free music (with credit), own song from phone, story report, file cleanup =====================
+do $$ begin
+  if exists (select 1 from pg_namespace where nspname = 'storage') then
+    insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+      values ('paudio', 'paudio', true, 5242880, array['audio/mpeg','audio/mp3','audio/mp4','audio/x-m4a','audio/aac','audio/ogg','audio/opus','audio/wav','audio/x-wav','audio/3gpp','audio/amr','audio/flac'])
+      on conflict (id) do update set public = true, file_size_limit = 5242880,
+        allowed_mime_types = array['audio/mpeg','audio/mp3','audio/mp4','audio/x-m4a','audio/aac','audio/ogg','audio/opus','audio/wav','audio/x-wav','audio/3gpp','audio/amr','audio/flac'];
+    insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+      values ('pmusic', 'pmusic', true, 15728640, array['audio/mpeg','application/json'])
+      on conflict (id) do update set public = true, file_size_limit = 15728640, allowed_mime_types = array['audio/mpeg','application/json'];
+    drop policy if exists paudio_insert on storage.objects;
+    create policy paudio_insert on storage.objects for insert to authenticated
+      with check (bucket_id = 'paudio' and (storage.foldername(name))[1] = auth.uid()::text);
+    drop policy if exists paudio_delete on storage.objects;
+    create policy paudio_delete on storage.objects for delete to authenticated
+      using (bucket_id = 'paudio' and (storage.foldername(name))[1] = auth.uid()::text);
+  end if;
+end $$;
+
+create table if not exists public.msg_story_report (story bigint not null, reporter uuid not null, at timestamptz not null default now(), primary key (story, reporter));
+alter table public.msg_story_report enable row level security;
+
+create or replace function public.msg_musicok(p_url text, p_uid uuid)
+returns boolean language sql immutable set search_path = public, pg_temp as $$
+  select coalesce(p_url, '') = ''
+    or p_url ~ '^https://payalapp\.in/music/t[0-9]+\.mp3$'
+    or p_url like 'https://hwfifqyssabwwdjlbqty.supabase.co/storage/v1/object/public/pmusic/%'
+    or p_url like 'https://hwfifqyssabwwdjlbqty.supabase.co/storage/v1/object/public/paudio/' || p_uid::text || '/%'
+$$;
+revoke all on function public.msg_musicok(text, uuid) from public, anon, authenticated;
+
+create or replace function public.msg_story_add2(p_kind text, p_url text, p_text text, p_bg text, p_music text)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare r json; nid bigint;
+begin
+  if not msg_musicok(p_music, auth.uid()) then return json_build_object('error', 'music'); end if;
+  r := msg_story_add(p_kind, p_url, p_text, p_bg);
+  nid := (r ->> 'id')::bigint;
+  if nid is not null and coalesce(p_music, '') <> '' then
+    update msg_story set music = left(p_music, 300) where id = nid and uid = auth.uid();
+  end if;
+  return r;
+end $$;
+
+-- files of my story that live in my own folders (photo and my own song); other music is shared and never deleted
+create or replace function public.msg_story_files(s public.msg_story)
+returns text[] language sql immutable set search_path = public, pg_temp as $$
+  select array_remove(array[
+    case when s.url like 'https://hwfifqyssabwwdjlbqty.supabase.co/storage/v1/object/public/pchat/' || s.uid::text || '/s\_%'
+      then substr(s.url, length('https://hwfifqyssabwwdjlbqty.supabase.co/storage/v1/object/public/') + 1) end,
+    case when s.music like 'https://hwfifqyssabwwdjlbqty.supabase.co/storage/v1/object/public/paudio/' || s.uid::text || '/%'
+      then substr(s.music, length('https://hwfifqyssabwwdjlbqty.supabase.co/storage/v1/object/public/') + 1) end], null)
+$$;
+revoke all on function public.msg_story_files(public.msg_story) from public, anon, authenticated;
+
+create or replace function public.msg_story_delete(p_id bigint)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare f text[] := '{}'; s msg_story;
+begin
+  select * into s from msg_story where id = p_id and uid = auth.uid();
+  if found then
+    f := msg_story_files(s);
+    delete from msg_story_seen where story = p_id;
+    delete from msg_story_report where story = p_id;
+    delete from msg_story where id = p_id;
+  end if;
+  return json_build_object('ok', true, 'files', to_json(f));
+end $$;
+
+-- my stories older than a day: removed, and their files handed back to the app to delete from the store
+create or replace function public.msg_old_files()
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); f text[] := '{}'; s msg_story;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  for s in select * from msg_story where uid = me and at < now() - interval '25 hours' loop
+    f := f || msg_story_files(s);
+    delete from msg_story_seen where story = s.id;
+    delete from msg_story_report where story = s.id;
+    delete from msg_story where id = s.id;
+  end loop;
+  return json_build_object('ok', true, 'files', to_json(f));
+end $$;
+
+create or replace function public.msg_story_report_it(p_id bigint)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid();
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  if not exists (select 1 from msg_story where id = p_id and uid <> me) then return json_build_object('error', 'story'); end if;
+  if not cm_hit(me, 'msg_story_report', 30) then return json_build_object('error', 'limit'); end if;
+  insert into msg_story_report (story, reporter) values (p_id, me) on conflict do nothing;
+  return json_build_object('ok', true);
+end $$;
+
+create or replace function public.msg_stories()
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); res json;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  with people as (
+    select me as u union
+    select case when a = me then b else a end from msg_friend where state = 'ok' and (a = me or b = me)
+  ), st as (
+    select s.*, exists (select 1 from msg_story_seen v where v.story = s.id and v.viewer = me) as viewed,
+      (select count(*) from msg_story_seen v where v.story = s.id) as views
+    from msg_story s join people p on p.u = s.uid
+    where s.at > now() - interval '24 hours' and not msg_blocked(me, s.uid)
+      and (s.uid = me or (not exists (select 1 from msg_story_report r where r.story = s.id and r.reporter = me)
+                          and (select count(*) from msg_story_report r where r.story = s.id) < 3))
+  )
+  select coalesce(json_agg(g order by g.mine desc, g.all_viewed, g.last_at desc), '[]'::json) into res from (
+    select (st.uid = me) as mine, msg_card(p) as card, bool_and(st.viewed or st.uid = me) as all_viewed, max(st.at) as last_at,
+      json_agg(json_build_object('id', st.id, 'kind', st.kind, 'url', st.url, 'text', st.txt, 'bg', st.bg, 'music', st.music, 'at', st.at, 'viewed', st.viewed,
+        'views', case when st.uid = me then st.views else null end) order by st.id) as items
+    from st join msg_profile p on p.uid = st.uid
+    group by st.uid, p.uid) g;
+  return json_build_object('items', res);
+end $$;
+
+do $$ declare f text; begin
+  foreach f in array array['msg_story_add2(text,text,text,text,text)','msg_story_delete(bigint)','msg_old_files()','msg_story_report_it(bigint)','msg_stories()'] loop
+    execute 'revoke all on function public.' || f || ' from public, anon';
+    execute 'grant execute on function public.' || f || ' to authenticated';
+  end loop;
+end $$;
 SQLEOF
 echo "Supabase access token paste karo (sbp_ se shuru, dikhega nahi), phir Enter:"
 read -s TOK
