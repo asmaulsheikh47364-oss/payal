@@ -471,6 +471,47 @@ do $$ declare f text; begin
     execute 'grant execute on function public.' || f || ' to authenticated';
   end loop;
 end $$;
+
+-- ===================== part 1c (2026-11-26): music on stories (Payal Chat's own tunes) =====================
+alter table public.msg_story add column if not exists music text not null default '';
+
+create or replace function public.msg_story_add2(p_kind text, p_url text, p_text text, p_bg text, p_music text)
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare r json; nid bigint;
+begin
+  r := msg_story_add(p_kind, p_url, p_text, p_bg);
+  nid := (r ->> 'id')::bigint;
+  if nid is not null and coalesce(p_music, '') like 'https://payalapp.in/music/%' then
+    update msg_story set music = left(p_music, 200) where id = nid and uid = auth.uid();
+  end if;
+  return r;
+end $$;
+
+create or replace function public.msg_stories()
+returns json language plpgsql security definer set search_path = public, pg_temp as $$
+declare me uuid := auth.uid(); res json;
+begin
+  if me is null then return json_build_object('error', 'login'); end if;
+  with people as (
+    select me as u union
+    select case when a = me then b else a end from msg_friend where state = 'ok' and (a = me or b = me)
+  ), st as (
+    select s.*, exists (select 1 from msg_story_seen v where v.story = s.id and v.viewer = me) as viewed,
+      (select count(*) from msg_story_seen v where v.story = s.id) as views
+    from msg_story s join people p on p.u = s.uid
+    where s.at > now() - interval '24 hours' and not msg_blocked(me, s.uid)
+  )
+  select coalesce(json_agg(g order by g.mine desc, g.all_viewed, g.last_at desc), '[]'::json) into res from (
+    select (st.uid = me) as mine, msg_card(p) as card, bool_and(st.viewed or st.uid = me) as all_viewed, max(st.at) as last_at,
+      json_agg(json_build_object('id', st.id, 'kind', st.kind, 'url', st.url, 'text', st.txt, 'bg', st.bg, 'music', st.music, 'at', st.at, 'viewed', st.viewed,
+        'views', case when st.uid = me then st.views else null end) order by st.id) as items
+    from st join msg_profile p on p.uid = st.uid
+    group by st.uid, p.uid) g;
+  return json_build_object('items', res);
+end $$;
+
+revoke all on function public.msg_story_add2(text,text,text,text,text) from public, anon;
+grant execute on function public.msg_story_add2(text,text,text,text,text) to authenticated;
 SQLEOF
 echo "Supabase access token paste karo (sbp_ se shuru, dikhega nahi), phir Enter:"
 read -s TOK
@@ -490,4 +531,4 @@ def q(sql):
 print("DATABASE", q(open("msg.sql", encoding="utf-8").read())[0])
 print("CHECK", q("select proname from pg_proc where proname like 'msg_%' order by 1")[1])
 PY
-[ $? -eq 0 ] && echo "=== TAIYAR: Payal Chat (baatcheet, photo, stories) ki jagah ban gayi ===" || echo "=== Kuch step fail hua, upar ka error bhejo ==="
+[ $? -eq 0 ] && echo "=== TAIYAR: Payal Chat (baatcheet, photo, stories, gaane) ki jagah ban gayi ===" || echo "=== Kuch step fail hua, upar ka error bhejo ==="
