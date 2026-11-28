@@ -1,12 +1,12 @@
 /* Payal website settings. Prices and offer names live here for now; the server (next step) will take them over. */
 window.PAYAL = {
   apkUrl: "https://payalapp.in/download/payal.apk",
-  apkVersion: "1.0.51",
-  apkBuild: 155,
+  apkVersion: "1.0.67",
+  apkBuild: 171,
   /* the version people see on the site (apkVersion and apkBuild stay as they are; the app reads apkBuild) */
-  apkVersionName: "1.0.51",
-  apkSize: "29 MB",
-  apkSha256: "e3af9089f8a723dc2d5d68afe6dbaadaae618447a676fbc73564f1ef9a066c81",
+  apkVersionName: "1.0.67",
+  apkSize: "30 MB",
+  apkSha256: "f130bc03f40f7ac6b71b841c107ac79b9590a48e16d67543d38a35101e07bd5c",
   whatsapp: "",
   email: "asmaulsheikh47364@gmail.com",
   paymentsLive: false,
