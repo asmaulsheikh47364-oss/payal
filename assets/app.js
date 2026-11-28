@@ -1,3 +1,9 @@
+/* While the page is being scrolled, the looping decorations (glows, sweeps, floating tags) pause, so scrolling stays smooth on every phone. */
+(function () {
+  var root = document.documentElement, t = 0;
+  function on() { if (!t) root.classList.add("scrolling"); clearTimeout(t); t = setTimeout(function () { root.classList.remove("scrolling"); t = 0; }, 260); }
+  window.addEventListener("scroll", on, { passive: true });
+})();
 (function () {
   var C = window.PAYAL || {};
   var $ = function (s, r) { return (r || document).querySelector(s); };

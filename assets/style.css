@@ -544,3 +544,6 @@ body{border-top:3px solid transparent;border-image:linear-gradient(90deg,#9fb4ff
 .launchline b{-webkit-text-fill-color:#fff}
 .obar-btn .shtxt,[data-apk] .shtxt{--c1:#2a1100;--c2:#a8602c}
 @media (prefers-reduced-motion:reduce){.shtxt,.festive,.plan.dw .offer,.plan .now,.price .now,.obar-t,.obar-p,.launchline,.plan.dw .t-offer{animation:none}}
+
+/* smooth scrolling: looping decorations pause while the page moves */
+.scrolling *,.scrolling *:before,.scrolling *:after{animation-play-state:paused!important}

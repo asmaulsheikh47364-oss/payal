@@ -8,6 +8,11 @@
   c.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:-1";
   document.body.insertBefore(c, document.body.firstChild);
   var g = c.getContext("2d"), W = 0, H = 0, flakes = [], last = 0, run = true;
+  /* weaker phones: fewer flakes and fewer frames; while the page is being scrolled the snow holds still so scrolling stays smooth */
+  var weak = (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  var STEP = weak ? 50 : 33, scrollUntil = 0;
+  window.addEventListener("scroll", function () { scrollUntil = performance.now() + 300; }, { passive: true });
+  window.addEventListener("touchmove", function () { scrollUntil = performance.now() + 300; }, { passive: true });
 
   /* pre-drawn soft flakes in 6 sizes */
   var SPR = [];
@@ -22,13 +27,18 @@
     x.fillStyle = gr; x.beginPath(); x.arc(m, m, r * 2, 0, 6.283); x.fill();
     SPR.push(o);
   }
-  function size() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+  function size() {
+    /* the phone's address bar hiding while scrolling changes the height a little: do not rebuild the canvas for that */
+    var w = window.innerWidth, h = window.innerHeight;
+    if (w === W && Math.abs(h - H) < 160) return;
+    W = c.width = w; H = c.height = h;
+  }
   function make(top) {
     var k = Math.floor(Math.random() * SPR.length);
     return { x: Math.random() * W, y: top ? -20 : Math.random() * H, k: k, v: 0.45 + k * 0.18, a: Math.random() * 6.3, s: 0.008 + Math.random() * 0.012 };
   }
   size();
-  var N = Math.min(48, Math.round(W * H / 15000));
+  var N = Math.min(weak ? 22 : 40, Math.round(W * H / 15000));
   for (var i = 0; i < N; i++) flakes.push(make(false));
   window.addEventListener("resize", size);
   var looping = false;
@@ -36,7 +46,7 @@
   function tick(now) {
     if (!run) { looping = false; return; }
     requestAnimationFrame(tick);
-    if (now - last < 33) return;
+    if (now - last < STEP || now < scrollUntil) return;
     last = now;
     g.clearRect(0, 0, W, H);
     for (var i = 0; i < flakes.length; i++) {
