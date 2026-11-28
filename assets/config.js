@@ -24,6 +24,24 @@ window.PAYAL = {
   ]
 };
 
+/* NEXT OFFER (2026-11-28): when the offer above ends, this one starts by itself with the same prices.
+   The page text, the offer name and the countdown switch on their own; the server job switches the names at the same moment. */
+window.PAYAL.nextOffer = { name: "Christmas and New Year Offer", ends: "2027-01-01T23:59:59+05:30", from: "Winter" };
+(function () {
+  var C = window.PAYAL, n = C.nextOffer, now = Date.now();
+  if (!n || !(Date.parse(C.offerEnds) <= now) || !(Date.parse(n.ends) > now)) return;
+  C.offerName = n.name; C.offerEnds = n.ends;
+  if (!document.body) return;
+  var newBase = n.name.replace(/ Offer$/, "");
+  var re = new RegExp(n.from + " ([Oo])ffer", "g");
+  var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null), t, list = [];
+  while ((t = w.nextNode())) if (re.test(t.nodeValue)) list.push(t);
+  list.forEach(function (x) { x.nodeValue = x.nodeValue.replace(re, function (m, o) { return newBase + " " + o + "ffer"; }); });
+  /* festival look: sparkle instead of the winter sun, a small tree in the top strip */
+  [].forEach.call(document.querySelectorAll('use[href="#i-sun"]'), function (u) { u.setAttribute("href", "#i-spark"); });
+  [].forEach.call(document.querySelectorAll(".obar-sun"), function (sv) { var e = document.createElement("span"); e.className = "obar-sun"; e.textContent = "\uD83C\uDF84"; e.style.fontSize = "18px"; e.style.lineHeight = "1"; sv.parentNode.replaceChild(e, sv); });
+})();
+
 /* HIDE_SHA: false = the SHA-256 line is shown so careful users can check the downloaded file. */
 var HIDE_SHA = false;
 document.addEventListener("DOMContentLoaded", function () { var e = document.getElementById("sha"); if (e && HIDE_SHA) e.style.display = "none"; });
